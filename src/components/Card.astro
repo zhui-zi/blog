@@ -7,9 +7,12 @@ type Props = {
   variant?: "h2" | "h3";
 } & CollectionEntry<"blog">;
 
-const { variant: Heading = "h2", id, data, filePath } = Astro.props;
+const post = Astro.props;
+const { variant: Heading = "h2", id, data, filePath } = post;
 
-const { title, description } = data;
+const { title } = data;
+import { getPostDescription } from "@/utils/getPostDescription";
+const summary = getPostDescription(post);
 ---
 
 <li class="my-6">
@@ -27,5 +30,5 @@ const { title, description } = data;
       {title}
     </Heading>
   </a>
-  <p>{description}</p>
+  <p>{summary}</p>
 </li>
