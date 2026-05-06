@@ -3,6 +3,7 @@ import type { CollectionEntry } from "astro:content";
 export const stripMarkdown = (markdown: string = "") => {
   return markdown
     .replace(/<!--[\s\S]*?-->/g, "") // Remove HTML comments
+    .replace(/<\/?[^>]+(>|$)/g, "") // Remove HTML tags
     .replace(/^---\n[\s\S]*?\n---\n/g, "") // Remove frontmatter
     .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1") // Remove links but keep text
     .replace(/[*_~`#|>+\-]/g, "") // Remove formatting characters
