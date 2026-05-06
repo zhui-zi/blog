@@ -1,68 +1,91 @@
-// ─── Cursor + ambient glow (init once, persists across page transitions) ──────
+// ─── Cursor + ambient glow ────────────────────────────────────────────────────
+// Global event listeners are registered once; element lookups are by ID so
+// they survive Astro's ClientRouter body swaps.
 
-function initCursorAndGlow() {
+let globalListenersReady = false;
+let mx = -300,
+  my = -300,
+  rx = -300,
+  ry = -300;
+
+function ensureCursorElements() {
   if (!window.matchMedia("(pointer: fine)").matches) return;
-  if (document.getElementById("cursor-dot")) return;
 
-  const dot = document.createElement("div");
-  dot.id = "cursor-dot";
-  dot.className = "cursor-dot";
+  if (!document.getElementById("cursor-dot")) {
+    const dot = document.createElement("div");
+    dot.id = "cursor-dot";
+    dot.className = "cursor-dot";
+    document.body.appendChild(dot);
+  }
 
-  const ring = document.createElement("div");
-  ring.id = "cursor-ring";
-  ring.className = "cursor-ring";
+  if (!document.getElementById("cursor-ring")) {
+    const ring = document.createElement("div");
+    ring.id = "cursor-ring";
+    ring.className = "cursor-ring";
+    document.body.appendChild(ring);
+  }
 
-  const glow = document.createElement("div");
-  glow.id = "mouse-glow";
-  glow.className = "mouse-glow";
+  if (!document.getElementById("mouse-glow")) {
+    const glow = document.createElement("div");
+    glow.id = "mouse-glow";
+    glow.className = "mouse-glow";
+    document.body.prepend(glow);
+  }
+}
 
-  document.body.prepend(glow);
-  document.body.append(dot, ring);
-
-  let mx = -300,
-    my = -300,
-    rx = -300,
-    ry = -300;
+function initGlobalListeners() {
+  if (globalListenersReady) return;
+  if (!window.matchMedia("(pointer: fine)").matches) return;
+  globalListenersReady = true;
 
   document.addEventListener("mousemove", e => {
     mx = e.clientX;
     my = e.clientY;
-    dot.style.transform = `translate(${mx}px,${my}px) translate(-50%,-50%)`;
-    glow.style.transform = `translate(${mx}px,${my}px) translate(-50%,-50%)`;
-    dot.classList.add("is-active");
-    ring.classList.add("is-active");
+
+    const dot = document.getElementById("cursor-dot");
+    const glow = document.getElementById("mouse-glow");
+    if (dot) {
+      dot.style.transform = `translate(${mx}px,${my}px) translate(-50%,-50%)`;
+      dot.classList.add("is-active");
+    }
+    document.getElementById("cursor-ring")?.classList.add("is-active");
+    if (glow) {
+      glow.style.transform = `translate(${mx}px,${my}px) translate(-50%,-50%)`;
+    }
   });
 
   document.addEventListener("mouseleave", () => {
-    dot.classList.remove("is-active");
-    ring.classList.remove("is-active");
+    document.getElementById("cursor-dot")?.classList.remove("is-active");
+    document.getElementById("cursor-ring")?.classList.remove("is-active");
   });
 
-  // Event delegation — no re-registration needed after page swaps
   document.addEventListener("mouseover", e => {
-    if ((e.target as Element).closest?.("a,button,[role='button']")) {
-      ring.classList.add("is-hovering");
-    }
-  });
-  document.addEventListener("mouseout", e => {
-    if ((e.target as Element).closest?.("a,button,[role='button']")) {
-      ring.classList.remove("is-hovering");
+    if ((e.target as Element).closest("a, button, [role='button']")) {
+      document.getElementById("cursor-ring")?.classList.add("is-hovering");
     }
   });
 
-  // Smooth lagging ring via RAF
+  document.addEventListener("mouseout", e => {
+    if ((e.target as Element).closest("a, button, [role='button']")) {
+      document.getElementById("cursor-ring")?.classList.remove("is-hovering");
+    }
+  });
+
+  // RAF ring-follow loop — looks up element each frame to survive DOM swaps
   (function loop() {
     rx += (mx - rx) * 0.11;
     ry += (my - ry) * 0.11;
-    ring.style.transform = `translate(${rx}px,${ry}px) translate(-50%,-50%)`;
+    const ring = document.getElementById("cursor-ring");
+    if (ring) {
+      ring.style.transform = `translate(${rx}px,${ry}px) translate(-50%,-50%)`;
+    }
     requestAnimationFrame(loop);
   })();
 }
 
-// ─── Scroll-in animations (re-run on each page) ────────────────────────────
+// ─── Scroll-in animations ─────────────────────────────────────────────────────
 
 function initScrollAnimations() {
-  // Remove stale classes from previous page
   document.querySelectorAll<HTMLElement>(".scroll-item").forEach(el => {
     el.classList.remove("scroll-item");
     el.removeAttribute("data-visible");
@@ -88,8 +111,13 @@ function initScrollAnimations() {
   });
 }
 
-// ─── Bootstrap ─────────────────────────────────────────────────────────────
+// ─── Bootstrap ────────────────────────────────────────────────────────────────
 
-initCursorAndGlow();
+ensureCursorElements();
+initGlobalListeners();
 initScrollAnimations();
-document.addEventListener("astro:after-swap", initScrollAnimations);
+
+document.addEventListener("astro:after-swap", () => {
+  ensureCursorElements(); // re-add cursor elements if Astro removed them
+  initScrollAnimations();
+});
