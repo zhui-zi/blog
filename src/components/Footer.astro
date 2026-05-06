@@ -1,6 +1,7 @@
 ---
 import type { HTMLAttributes } from "astro/types";
 import Socials from "./Socials.astro";
+import IconCC from "@/assets/icons/IconCC.svg";
 
 type Props = {
   noMarginTop?: boolean;
@@ -22,6 +23,7 @@ const { noMarginTop = false, class: className, ...attrs } = Astro.props;
   >
     <Socials />
     <div class="my-2 flex flex-col items-center whitespace-nowrap sm:flex-row">
+      <IconCC width={16} height={16} class="me-1 inline-block" />
       <span>CC BY-NC 4.0</span>
     </div>
   </div>

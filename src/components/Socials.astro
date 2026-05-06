@@ -34,6 +34,8 @@ const linkClass =
                 class={linkClass}
                 title={link.name}
                 aria-label={link.name}
+                target="_blank"
+                rel="noopener noreferrer"
               >
                 <span aria-hidden="true">{link.emoji}</span>
                 <span class="sr-only">{link.name}</span>
@@ -59,6 +61,8 @@ const linkClass =
           class={linkClass}
           title={social.name}
           aria-label={social.name}
+          target="_blank"
+          rel="noopener noreferrer"
         >
           <span aria-hidden="true">{social.emoji}</span>
           <span class="sr-only">{social.name}</span>
