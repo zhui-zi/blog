@@ -27,6 +27,13 @@
       @apply text-foreground;
     }
 
+    p {
+      text-align: justify;
+      text-justify: inter-ideograph;
+      margin-top: 1.5em;
+      margin-bottom: 1.5em;
+    }
+
     a {
       @apply wrap-break-word text-foreground decoration-dashed underline-offset-4 hover:text-accent focus-visible:no-underline;
     }
