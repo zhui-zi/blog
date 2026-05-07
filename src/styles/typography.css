@@ -10,7 +10,7 @@
     h3,
     h4,
     th {
-      @apply mb-3 text-foreground;
+      @apply mb-3 text-foreground font-bold tracking-wide;
     }
 
     h3 {
@@ -31,10 +31,12 @@
     }
 
     p {
-      text-align: justify;
-      text-justify: inter-ideograph;
-      margin-top: 2em;
-      margin-bottom: 2em;
+      text-align: left;
+      line-height: 1.8;
+      letter-spacing: 0.02em;
+      margin-top: 1.5em;
+      margin-bottom: 1.5em;
+      font-weight: 300;
     }
 
     a {

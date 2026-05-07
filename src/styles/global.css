@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&display=swap");
+@import url("https://fonts.loli.net/css2?family=Noto+Serif+SC:wght@300;400;500;700&display=swap");
 @import "tailwindcss";
 @import "./typography.css";
 
@@ -6,25 +6,23 @@
 
 :root,
 html[data-theme="light"] {
-  --background: rgb(245, 245, 245);
-  --foreground: rgb(31, 31, 31);
-  --accent: #3560ab;
-  --muted: #e6e6e6;
-  --border: #ece9e9;
+  --background: #d0ccbd;
+  --foreground: #434343;
+  --accent: #434343;
+  --muted: #bab6a7;
+  --border: #a5a193;
   --font-source-han-serif:
-    "Noto Serif SC", "Source Han Serif SC", "Source Han Serif CN", "思源宋体",
-    "Songti SC", SimSun, serif;
+    "Noto Serif SC", serif;
 }
 
 html[data-theme="dark"] {
-  --background: rgb(29, 30, 32);
-  --foreground: #eaedf3;
-  --accent: #1ad9d9;
-  --muted: rgb(46, 46, 51);
-  --border: #3b4655;
+  --background: #2a2a2a;
+  --foreground: #d0ccbd;
+  --accent: #d0ccbd;
+  --muted: #3a3a3a;
+  --border: #4a4a4a;
   --font-source-han-serif:
-    "Noto Serif SC", "Source Han Serif SC", "Source Han Serif CN", "思源宋体",
-    "Songti SC", SimSun, serif;
+    "Noto Serif SC", serif;
 }
 
 @theme inline {
@@ -44,15 +42,19 @@ html[data-theme="dark"] {
   }
   html {
     @apply overflow-y-scroll scroll-smooth;
-    font-size: 17px;
+    font-size: 15px;
+    line-height: 1.8;
+  }
+  p {
+    @apply mb-5;
   }
   @media (min-width: 640px) {
     html {
-      font-size: 18px;
+      font-size: 15px;
     }
   }
   body {
-    @apply flex min-h-svh flex-col bg-background font-app text-foreground selection:bg-accent/75 selection:text-background;
+    @apply flex min-h-svh flex-col bg-background font-app text-foreground font-light selection:bg-accent/75 selection:text-background;
   }
   a,
   button {
