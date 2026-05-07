@@ -54,7 +54,7 @@ html[data-theme="dark"] {
     }
   }
   body {
-    @apply flex min-h-svh flex-col bg-background font-app text-foreground font-light selection:bg-accent/75 selection:text-background;
+    @apply flex min-h-svh flex-col bg-background font-app text-foreground font-normal selection:bg-accent/75 selection:text-background;
   }
   a,
   button {
