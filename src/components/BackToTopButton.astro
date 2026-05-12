@@ -1,29 +1,32 @@
 ---
 import IconChevronLeft from "@/assets/icons/IconChevronLeft.svg";
-import IconArrowNarrowUp from "@/assets/icons/IconArrowNarrowUp.svg";
 ---
 
 <div
   id="btt-btn-container"
   class:list={[
     "fixed end-4 bottom-8 z-50",
-    "translate-y-14 opacity-0 transition duration-500",
+    "translate-y-14 opacity-0 transition-all duration-500",
   ]}
 >
   <button
     data-button="back-to-top"
     class:list={[
-      "group relative bg-background px-2 py-1",
-      "size-14 rounded-full shadow-xl border border-border flex justify-center items-center",
-      "hover:bg-muted/50 transition-colors",
+      "group relative",
+      "size-14 rounded-full px-2 py-1 shadow-xl lg:h-8 lg:w-fit lg:rounded-md lg:shadow-none",
+      "bg-background lg:bg-transparent",
     ]}
-    aria-label="Back to Top"
   >
     <span
       id="progress-indicator"
-      class="absolute inset-0 -z-10 block size-14 scale-110 rounded-full bg-transparent"
+      class="absolute inset-0 -z-10 block size-14 scale-110 rounded-full bg-transparent lg:hidden lg:h-8 lg:rounded-md"
     ></span>
-    <IconChevronLeft class="inline-block rotate-90 size-6 text-foreground group-hover:text-accent transition-colors" />
+    <IconChevronLeft class="inline-block rotate-90 lg:hidden" />
+    <span
+      class="sr-only underline decoration-dashed decoration-2 underline-offset-4 group-hover:text-accent lg:not-sr-only"
+    >
+      <span class="text-xl" tabindex="0">&uarr;</span> Back To Top
+    </span>
   </button>
 </div>
 
