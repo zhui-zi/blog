@@ -2,7 +2,7 @@ export const SITE = {
   website: "https://keita.cc/", // replace this with your deployed domain
   author: "黑川启太",
   profile: "https://keita.cc/",
-  desc: "i live in mars 👨‍🚀🔴✨",
+  desc: "從瘋人院逃離後重新回到社會。",
   title: "黑川启太",
   ogImage: "astropaper-og.jpg",
   lightAndDarkMode: true,

@@ -31,7 +31,6 @@ interface SocialGroup {
 export type Social = SocialLink | SocialGroup;
 
 export const TOOL_LINKS = [
-  { name: "📓 Blog", url: "https://blog.keita.cc/" },
   { name: "☁️ Cloud", url: "https://file.keita.cc/" },
   { name: "🎥 OBS Overlay", url: "https://obsliveoverlay.keita.cc/" },
   { name: "🍺 SillyTavern", url: "https://jg.keita.cc" },
