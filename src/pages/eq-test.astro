@@ -19,379 +19,240 @@ import { SITE } from "@/config";
 </Layout>
 
 <style is:global>
-  /* reset global styles that bleed into dynamically-generated quiz HTML */
-  #eq-root p { margin-bottom: 0; }
-  #eq-root h1, #eq-root h2 {
-    font-size: inherit;
-    font-weight: inherit;
-    line-height: inherit;
-    margin: 0;
-    padding: 0;
+  /* All rules scoped to #eq-root — no effect on other pages */
+
+  #eq-root p, #eq-root h1, #eq-root h2 {
+    margin: 0; padding: 0;
+    font-size: inherit; font-weight: inherit; line-height: inherit;
   }
+
   /* ── Progress bar ── */
-  .eq-progress {
-    position: sticky;
-    top: 0;
-    z-index: 20;
+  #eq-root .eq-progress {
+    position: sticky; top: 0; z-index: 20;
     background: var(--color-background);
     border-bottom: 1px solid var(--color-border);
-    padding: 0.5rem 0 0;
-    margin-bottom: 2rem;
+    padding: 0.5rem 0 0; margin-bottom: 2rem;
   }
-  .eq-progress-text {
-    text-align: center;
-    font-size: 0.8rem;
-    color: var(--color-muted);
-    padding-bottom: 0.4rem;
+  #eq-root .eq-progress-text {
+    text-align: center; font-size: 0.8rem;
+    color: var(--color-muted); padding-bottom: 0.4rem;
   }
-  .eq-progress-track {
+  #eq-root .eq-progress-track {
     height: 2px;
     background: color-mix(in srgb, var(--color-muted) 40%, transparent);
   }
-  .eq-progress-fill {
-    height: 100%;
-    background: var(--color-foreground);
+  #eq-root .eq-progress-fill {
+    height: 100%; background: var(--color-foreground);
     transition: width 0.35s ease;
   }
 
   /* ── Section header ── */
-  .eq-section {
-    margin-top: 3rem;
-    margin-bottom: 1.75rem;
-  }
-  .eq-section-eyebrow {
-    font-size: 0.72rem;
-    letter-spacing: 0.12em;
-    color: var(--color-muted);
-    text-transform: uppercase;
+  #eq-root .eq-section { margin-top: 3rem; margin-bottom: 1.75rem; }
+  #eq-root .eq-section-eyebrow {
+    font-size: 0.72rem; letter-spacing: 0.12em;
+    color: var(--color-muted); text-transform: uppercase;
     margin: 0 0 0.35rem;
   }
-  .eq-section-title {
-    font-size: 1.1rem;
-    font-weight: 500;
-    letter-spacing: 0.02em;
-    margin: 0 0 0.4rem;
-    padding-bottom: 0.6rem;
+  #eq-root .eq-section-title {
+    font-size: 1.1rem; font-weight: 500; letter-spacing: 0.02em;
+    margin: 0 0 0.4rem; padding-bottom: 0.6rem;
     border-bottom: 1px solid var(--color-border);
   }
-  .eq-section-note {
-    font-size: 0.83rem;
-    color: var(--color-muted);
-    margin: 0.5rem 0 0;
-    line-height: 1.7;
+  #eq-root .eq-section-note {
+    font-size: 0.83rem; color: var(--color-muted);
+    margin: 0.5rem 0 0; line-height: 1.7;
   }
 
   /* ── Question card ── */
-  .eq-q {
-    border: 1px solid var(--color-border);
-    border-radius: 5px;
-    margin-bottom: 1.25rem;
-    transition: border-color 0.2s;
-    overflow: hidden;
+  #eq-root .eq-q {
+    border: 1px solid var(--color-border); border-radius: 5px;
+    margin-bottom: 1.25rem; transition: border-color 0.2s; overflow: hidden;
   }
-  .eq-q.unanswered-highlight {
-    border-color: #b03a2e;
-    box-shadow: 0 0 0 1px #b03a2e22;
+  #eq-root .eq-q.unanswered-highlight {
+    border-color: #b03a2e; box-shadow: 0 0 0 1px #b03a2e22;
   }
-  .eq-q-head {
+  #eq-root .eq-q-head {
     padding: 1.1rem 1.25rem 0.85rem;
-    display: flex;
-    gap: 0.7rem;
-    align-items: flex-start;
+    display: flex; gap: 0.7rem; align-items: flex-start;
   }
-  .eq-q-num {
-    font-size: 0.7rem;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    color: var(--color-muted);
-    min-width: 1.6rem;
-    padding-top: 0.22rem;
-    flex-shrink: 0;
+  #eq-root .eq-q-num {
+    font-size: 0.7rem; font-weight: 600; letter-spacing: 0.08em;
+    color: var(--color-muted); min-width: 1.6rem;
+    padding-top: 0.22rem; flex-shrink: 0;
   }
-  .eq-q-stem {
-    font-size: 0.93rem;
-    line-height: 1.75;
-    margin: 0;
-  }
-  .eq-opts {
+  #eq-root .eq-q-stem { font-size: 0.93rem; line-height: 1.75; margin: 0; }
+  #eq-root .eq-opts {
     padding: 0 1.25rem 1.1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.45rem;
+    display: flex; flex-direction: column; gap: 0.45rem;
   }
 
   /* ── SJT / Part-3 option rows ── */
-  .eq-opt {
-    display: flex;
-    align-items: stretch;
-    border: 1px solid var(--color-border);
-    border-radius: 4px;
-    cursor: pointer;
-    overflow: hidden;
-    transition: border-color 0.15s;
-    user-select: none;
+  #eq-root .eq-opt {
+    display: flex; align-items: stretch;
+    border: 1px solid var(--color-border); border-radius: 4px;
+    cursor: pointer; overflow: hidden;
+    transition: border-color 0.15s; user-select: none;
   }
-  .eq-opt input[type="radio"] {
-    position: absolute;
-    opacity: 0;
-    width: 0;
-    height: 0;
+  #eq-root .eq-opt input[type="radio"] {
+    position: absolute; opacity: 0; width: 0; height: 0;
   }
-  .eq-opt-badge {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 2.6rem;
-    padding: 0.62rem 0;
+  #eq-root .eq-opt-badge {
+    display: flex; align-items: center; justify-content: center;
+    min-width: 2.6rem; padding: 0.62rem 0;
     background: color-mix(in srgb, var(--color-muted) 18%, var(--color-background) 82%);
     border-right: 1px solid var(--color-border);
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    color: var(--color-muted);
-    flex-shrink: 0;
+    font-size: 0.75rem; font-weight: 700; letter-spacing: 0.04em;
+    color: var(--color-muted); flex-shrink: 0;
     transition: background 0.15s, color 0.15s, border-color 0.15s;
   }
-  .eq-opt-text {
-    padding: 0.62rem 0.9rem;
-    font-size: 0.88rem;
-    line-height: 1.65;
-    flex: 1;
+  #eq-root .eq-opt-text {
+    padding: 0.62rem 0.9rem; font-size: 0.88rem; line-height: 1.65; flex: 1;
   }
-  .eq-opt:hover {
+  #eq-root .eq-opt:hover {
     border-color: color-mix(in srgb, var(--color-foreground) 55%, transparent);
   }
-  .eq-opt:hover .eq-opt-badge {
+  #eq-root .eq-opt:hover .eq-opt-badge {
     border-right-color: color-mix(in srgb, var(--color-foreground) 55%, transparent);
   }
-  .eq-opt.is-selected {
-    border-color: var(--color-foreground);
-  }
-  .eq-opt.is-selected .eq-opt-badge {
-    background: var(--color-foreground);
-    color: var(--color-background);
+  #eq-root .eq-opt.is-selected { border-color: var(--color-foreground); }
+  #eq-root .eq-opt.is-selected .eq-opt-badge {
+    background: var(--color-foreground); color: var(--color-background);
     border-right-color: var(--color-foreground);
   }
-  .eq-opt.is-selected .eq-opt-text {
-    font-weight: 500;
-  }
+  #eq-root .eq-opt.is-selected .eq-opt-text { font-weight: 500; }
 
   /* ── Likert (Part 2) ── */
-  .eq-likert {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    row-gap: 0.6rem;
+  #eq-root .eq-likert {
+    display: flex; align-items: center;
+    gap: 0.5rem; flex-wrap: wrap; row-gap: 0.6rem;
   }
-  .eq-likert-label {
-    font-size: 0.75rem;
-    color: var(--color-muted);
-    white-space: nowrap;
-    flex-shrink: 0;
+  #eq-root .eq-likert-label {
+    font-size: 0.75rem; color: var(--color-muted);
+    white-space: nowrap; flex-shrink: 0;
   }
-  .eq-likert-btns {
-    display: flex;
-    gap: 0.5rem;
-    flex-grow: 1;
-    justify-content: center;
+  #eq-root .eq-likert-btns {
+    display: flex; gap: 0.5rem; flex-grow: 1; justify-content: center;
   }
-  .eq-lk {
-    width: 2.6rem;
-    height: 2.6rem;
-    border-radius: 50%;
+  #eq-root .eq-lk {
+    width: 2.6rem; height: 2.6rem; border-radius: 50%;
     border: 1px solid var(--color-border);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 0.82rem;
-    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 0.82rem; flex-shrink: 0;
     transition: border-color 0.15s, background 0.15s, color 0.15s;
     user-select: none;
   }
-  .eq-lk input[type="radio"] {
-    position: absolute;
-    opacity: 0;
-    width: 0;
-    height: 0;
+  #eq-root .eq-lk input[type="radio"] {
+    position: absolute; opacity: 0; width: 0; height: 0;
   }
-  .eq-lk:hover {
+  #eq-root .eq-lk:hover {
     border-color: color-mix(in srgb, var(--color-foreground) 55%, transparent);
   }
-  .eq-lk.is-selected {
-    background: var(--color-foreground);
-    color: var(--color-background);
-    border-color: var(--color-foreground);
-    font-weight: 600;
+  #eq-root .eq-lk.is-selected {
+    background: var(--color-foreground); color: var(--color-background);
+    border-color: var(--color-foreground); font-weight: 600;
   }
   @media (max-width: 480px) {
-    .eq-likert-label { display: none; }
-    .eq-lk { width: 2.4rem; height: 2.4rem; }
+    #eq-root .eq-likert-label { display: none; }
+    #eq-root .eq-lk { width: 2.4rem; height: 2.4rem; }
   }
 
   /* ── Submit / Error ── */
-  .eq-error {
-    color: #b03a2e;
-    font-size: 0.85rem;
-    text-align: center;
-    margin: 0.75rem 0;
-    display: none;
-    line-height: 1.6;
+  #eq-root .eq-error {
+    color: #b03a2e; font-size: 0.85rem; text-align: center;
+    margin: 0.75rem 0; display: none; line-height: 1.6;
   }
-  .eq-submit {
-    display: block;
-    margin: 2.5rem auto 0;
-    padding: 0.75rem 2.75rem;
-    background: var(--color-foreground);
-    color: var(--color-background);
-    border: none;
-    border-radius: 4px;
-    font-size: 0.95rem;
-    font-family: var(--font-app);
-    cursor: pointer;
-    letter-spacing: 0.06em;
-    transition: opacity 0.2s;
+  #eq-root .eq-submit {
+    display: block; margin: 2.5rem auto 0; padding: 0.75rem 2.75rem;
+    background: var(--color-foreground); color: var(--color-background);
+    border: none; border-radius: 4px; font-size: 0.95rem;
+    font-family: var(--font-app); cursor: pointer;
+    letter-spacing: 0.06em; transition: opacity 0.2s;
   }
-  .eq-submit:hover { opacity: 0.82; }
+  #eq-root .eq-submit:hover { opacity: 0.82; }
 
   /* ── Results ── */
-  .eq-result-header {
-    text-align: center;
-    padding: 2rem 1.5rem;
-    border: 1px solid var(--color-border);
-    border-radius: 5px;
-    margin-bottom: 1.25rem;
+  #eq-root .eq-result-header {
+    text-align: center; padding: 2rem 1.5rem;
+    border: 1px solid var(--color-border); border-radius: 5px; margin-bottom: 1.25rem;
   }
-  .eq-score-pct {
-    font-size: 4rem;
-    font-weight: 300;
-    letter-spacing: -0.03em;
-    line-height: 1;
+  #eq-root .eq-score-pct {
+    font-size: 4rem; font-weight: 300; letter-spacing: -0.03em; line-height: 1;
   }
-  .eq-score-pct-sign { font-size: 1.8rem; }
-  .eq-score-raw {
-    font-size: 0.82rem;
-    color: var(--color-muted);
-    margin: 0.25rem 0 0.8rem;
+  #eq-root .eq-score-pct-sign { font-size: 1.8rem; }
+  #eq-root .eq-score-raw {
+    font-size: 0.82rem; color: var(--color-muted); margin: 0.25rem 0 0.8rem;
   }
-  .eq-level-pill {
-    display: inline-block;
-    padding: 0.22rem 1.1rem;
-    border: 1px solid var(--color-border);
-    border-radius: 2rem;
-    font-size: 0.88rem;
-    letter-spacing: 0.06em;
-    margin-bottom: 0.7rem;
+  #eq-root .eq-level-pill {
+    display: inline-block; padding: 0.22rem 1.1rem;
+    border: 1px solid var(--color-border); border-radius: 2rem;
+    font-size: 0.88rem; letter-spacing: 0.06em; margin-bottom: 0.7rem;
   }
-  .eq-level-desc {
-    font-size: 0.85rem;
-    color: var(--color-muted);
-    line-height: 1.75;
-    margin: 0;
+  #eq-root .eq-level-desc {
+    font-size: 0.85rem; color: var(--color-muted); line-height: 1.75; margin: 0;
   }
-  .eq-validity {
+  #eq-root .eq-validity {
     background: color-mix(in srgb, #b03a2e 8%, var(--color-background) 92%);
     border: 1px solid color-mix(in srgb, #b03a2e 45%, transparent);
-    border-radius: 5px;
-    padding: 1rem 1.25rem;
-    margin-bottom: 1.25rem;
-    font-size: 0.87rem;
-    line-height: 1.8;
+    border-radius: 5px; padding: 1rem 1.25rem; margin-bottom: 1.25rem;
+    font-size: 0.87rem; line-height: 1.8;
   }
-  .eq-card {
-    border: 1px solid var(--color-border);
-    border-radius: 5px;
-    padding: 1.25rem;
-    margin-bottom: 1.25rem;
+  #eq-root .eq-card {
+    border: 1px solid var(--color-border); border-radius: 5px;
+    padding: 1.25rem; margin-bottom: 1.25rem;
   }
-  .eq-card-title {
-    font-size: 0.82rem;
-    letter-spacing: 0.08em;
-    color: var(--color-muted);
-    text-transform: uppercase;
-    margin: 0 0 1.1rem;
+  #eq-root .eq-card-title {
+    font-size: 0.82rem; letter-spacing: 0.08em;
+    color: var(--color-muted); text-transform: uppercase; margin: 0 0 1.1rem;
   }
-  .eq-radar-wrap {
-    max-width: 420px;
-    margin: 0 auto 1.25rem;
+  #eq-root .eq-radar-wrap { max-width: 420px; margin: 0 auto 1.25rem; }
+  #eq-root .eq-dim-row { margin-bottom: 1rem; }
+  #eq-root .eq-dim-meta {
+    display: flex; justify-content: space-between;
+    align-items: baseline; margin-bottom: 0.3rem;
   }
-  .eq-dim-row {
-    margin-bottom: 1rem;
-  }
-  .eq-dim-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin-bottom: 0.3rem;
-  }
-  .eq-dim-name { font-size: 0.88rem; }
-  .eq-dim-val { font-size: 0.8rem; color: var(--color-muted); }
-  .eq-bar-track {
+  #eq-root .eq-dim-name { font-size: 0.88rem; }
+  #eq-root .eq-dim-val { font-size: 0.8rem; color: var(--color-muted); }
+  #eq-root .eq-bar-track {
     height: 5px;
     background: color-mix(in srgb, var(--color-muted) 35%, var(--color-background) 65%);
-    border-radius: 3px;
-    overflow: hidden;
+    border-radius: 3px; overflow: hidden;
   }
-  .eq-bar-fill {
-    height: 100%;
-    background: var(--color-foreground);
-    border-radius: 3px;
-    transition: width 0.7s ease;
+  #eq-root .eq-bar-fill {
+    height: 100%; background: var(--color-foreground);
+    border-radius: 3px; transition: width 0.7s ease;
   }
-  .eq-sub-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 0.75rem;
-    text-align: center;
+  #eq-root .eq-sub-grid {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 0.75rem; text-align: center;
   }
-  .eq-sub-score { font-size: 1.5rem; font-weight: 300; }
-  .eq-sub-unit { font-size: 0.78rem; font-weight: 400; color: var(--color-muted); }
-  .eq-sub-lbl { font-size: 0.75rem; color: var(--color-muted); margin-top: 0.1rem; }
-  .eq-reset {
-    display: block;
-    margin: 1.5rem auto 0;
-    padding: 0.6rem 1.75rem;
-    background: transparent;
-    color: var(--color-foreground);
-    border: 1px solid var(--color-border);
-    border-radius: 4px;
-    font-size: 0.88rem;
-    font-family: var(--font-app);
-    cursor: pointer;
-    letter-spacing: 0.04em;
-    transition: background 0.15s;
+  #eq-root .eq-sub-score { font-size: 1.5rem; font-weight: 300; }
+  #eq-root .eq-sub-unit { font-size: 0.78rem; font-weight: 400; color: var(--color-muted); }
+  #eq-root .eq-sub-lbl { font-size: 0.75rem; color: var(--color-muted); margin-top: 0.1rem; }
+  #eq-root .eq-reset {
+    display: block; margin: 1.5rem auto 0; padding: 0.6rem 1.75rem;
+    background: transparent; color: var(--color-foreground);
+    border: 1px solid var(--color-border); border-radius: 4px;
+    font-size: 0.88rem; font-family: var(--font-app);
+    cursor: pointer; letter-spacing: 0.04em; transition: background 0.15s;
   }
-  .eq-reset:hover {
+  #eq-root .eq-reset:hover {
     background: color-mix(in srgb, var(--color-foreground) 7%, transparent);
   }
-  .eq-disclaimer {
-    font-size: 0.75rem;
-    color: var(--color-muted);
-    text-align: center;
-    line-height: 1.7;
-    margin: 1rem 0 0;
+  #eq-root .eq-disclaimer {
+    font-size: 0.75rem; color: var(--color-muted);
+    text-align: center; line-height: 1.7; margin: 1rem 0 0;
   }
-  .eq-intro {
-    border: 1px solid var(--color-border);
-    border-radius: 5px;
-    padding: 1.1rem 1.25rem;
-    margin-bottom: 2.5rem;
-    font-size: 0.87rem;
-    line-height: 1.8;
+  #eq-root .eq-intro {
+    border: 1px solid var(--color-border); border-radius: 5px;
+    padding: 1.1rem 1.25rem; margin-bottom: 2.5rem;
+    font-size: 0.87rem; line-height: 1.8;
   }
-  .eq-intro-title {
-    font-size: 0.72rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--color-muted);
-    margin: 0 0 0.5rem;
+  #eq-root .eq-intro-title {
+    font-size: 0.72rem; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--color-muted); margin: 0 0 0.5rem;
   }
-  .eq-intro ul {
-    margin: 0;
-    padding-left: 1.2rem;
-  }
-  .eq-intro li { margin-bottom: 0.15rem; }
+  #eq-root .eq-intro ul { margin: 0; padding-left: 1.2rem; }
+  #eq-root .eq-intro li { margin-bottom: 0.15rem; }
 </style>
 
 <script is:inline>
