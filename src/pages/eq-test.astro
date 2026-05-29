@@ -18,7 +18,16 @@ import { SITE } from "@/config";
   <Footer />
 </Layout>
 
-<style>
+<style is:global>
+  /* reset global styles that bleed into dynamically-generated quiz HTML */
+  #eq-root p { margin-bottom: 0; }
+  #eq-root h1, #eq-root h2 {
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+    margin: 0;
+    padding: 0;
+  }
   /* ── Progress bar ── */
   .eq-progress {
     position: sticky;
