@@ -1,0 +1,703 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import Breadcrumb from "@/components/Breadcrumb.astro";
+import { SITE } from "@/config";
+---
+
+<Layout
+  title={`情商综合测评 | ${SITE.title}`}
+  description="综合情商互动测评，自动算分，生成七维能力雷达图。整合 Mayer-Salovey-Caruso、Goleman 与 Bar-On 三大框架。"
+>
+  <Header />
+  <Breadcrumb />
+  <main id="main-content" class="app-layout">
+    <div id="eq-root" class="py-8"></div>
+  </main>
+  <Footer />
+</Layout>
+
+<style>
+  .eq-q {
+    margin-bottom: 1.25rem;
+    padding: 1rem 1.25rem;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    transition: border-color 0.2s;
+  }
+  .eq-q.unanswered-highlight {
+    border-color: #c0392b;
+  }
+  .eq-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    cursor: pointer;
+    padding: 0.3rem 0.5rem;
+    border-radius: 3px;
+    line-height: 1.65;
+    transition: background 0.15s;
+  }
+  .eq-option:hover {
+    background: color-mix(in srgb, var(--color-foreground) 6%, transparent);
+  }
+  .eq-option input[type="radio"] {
+    margin-top: 0.28rem;
+    flex-shrink: 0;
+    accent-color: var(--color-foreground);
+    cursor: pointer;
+  }
+  .eq-option.is-selected {
+    font-weight: 500;
+  }
+  .eq-likert-row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+  .eq-likert-label {
+    font-size: 0.78rem;
+    color: var(--color-muted);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .eq-likert-options {
+    display: flex;
+    gap: 1.25rem;
+    align-items: center;
+    padding: 0 0.75rem;
+    flex-shrink: 0;
+  }
+  .eq-likert-opt {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+    cursor: pointer;
+  }
+  .eq-likert-opt input[type="radio"] {
+    accent-color: var(--color-foreground);
+    cursor: pointer;
+  }
+  .eq-likert-opt span {
+    font-size: 0.82rem;
+  }
+  .eq-section-head {
+    margin: 2.5rem 0 0.25rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--color-border);
+    font-size: 1.05rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+  .eq-section-note {
+    font-size: 0.87rem;
+    color: var(--color-muted);
+    margin: 0.4rem 0 1.25rem;
+    line-height: 1.7;
+  }
+  .eq-submit-btn {
+    display: block;
+    margin: 2rem auto;
+    padding: 0.7rem 2.5rem;
+    background: var(--color-foreground);
+    color: var(--color-background);
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-family: var(--font-app);
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: opacity 0.2s;
+  }
+  .eq-submit-btn:hover {
+    opacity: 0.85;
+  }
+  .eq-progress-bar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--color-background);
+    border-bottom: 1px solid var(--color-border);
+    padding: 0.45rem 0;
+    text-align: center;
+    font-size: 0.83rem;
+    color: var(--color-muted);
+  }
+  .eq-progress-inner {
+    height: 2px;
+    background: var(--color-foreground);
+    transition: width 0.3s ease;
+    margin-top: 0.3rem;
+  }
+  .eq-dim-row {
+    margin-bottom: 0.85rem;
+  }
+  .eq-dim-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    margin-bottom: 0.28rem;
+  }
+  .eq-dim-muted {
+    color: var(--color-muted);
+    font-size: 0.85rem;
+  }
+  .eq-bar-track {
+    height: 6px;
+    background: var(--color-muted);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .eq-bar-fill {
+    height: 100%;
+    background: var(--color-foreground);
+    border-radius: 3px;
+  }
+  .eq-card {
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    padding: 1.25rem;
+    margin-bottom: 1.25rem;
+  }
+  .eq-score-big {
+    font-size: 3.2rem;
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .eq-score-sup {
+    font-size: 1.3rem;
+    font-weight: 300;
+  }
+  .eq-level-badge {
+    display: inline-block;
+    padding: 0.18rem 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: 2rem;
+    font-size: 0.92rem;
+    letter-spacing: 0.05em;
+    margin: 0.4rem 0 0.6rem;
+  }
+  .eq-validity-box {
+    background: color-mix(in srgb, #c0392b 10%, var(--color-background) 90%);
+    border: 1px solid color-mix(in srgb, #c0392b 60%, transparent);
+    border-radius: 4px;
+    padding: 1rem;
+    margin-bottom: 1.25rem;
+    font-size: 0.9rem;
+    line-height: 1.75;
+  }
+  .eq-sub-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0.5rem;
+    text-align: center;
+  }
+  .eq-sub-num {
+    font-size: 1.4rem;
+    font-weight: 300;
+  }
+  .eq-sub-label {
+    font-size: 0.78rem;
+    color: var(--color-muted);
+  }
+  .eq-radar-wrap {
+    max-width: 400px;
+    margin: 0 auto 1.5rem;
+  }
+  .eq-error {
+    color: #c0392b;
+    font-size: 0.88rem;
+    text-align: center;
+    margin: 0.75rem 0;
+    display: none;
+  }
+  .eq-reset-btn {
+    display: block;
+    margin: 1rem auto 0;
+    padding: 0.55rem 1.75rem;
+    background: transparent;
+    color: var(--color-foreground);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    font-size: 0.92rem;
+    font-family: var(--font-app);
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    transition: background 0.15s;
+  }
+  .eq-reset-btn:hover {
+    background: color-mix(in srgb, var(--color-foreground) 8%, transparent);
+  }
+  .eq-intro-box {
+    background: color-mix(in srgb, var(--color-muted) 25%, var(--color-background) 75%);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 2rem;
+    font-size: 0.9rem;
+    line-height: 1.8;
+  }
+  .eq-intro-box ul {
+    margin: 0.3rem 0 0;
+    padding-left: 1.4rem;
+  }
+  .eq-intro-box li {
+    margin-bottom: 0.2rem;
+  }
+  @media (max-width: 500px) {
+    .eq-likert-label { display: none; }
+    .eq-likert-options { padding: 0; }
+  }
+</style>
+
+<script is:inline>
+(function () {
+  // ─── Question Data ────────────────────────────────────────────────
+
+  var P1Q = [
+    { n: 1, s: "你精心准备的方案在重要会议上被上级当众、略带嘲讽地否定。你的第一反应更接近：", o: ["当场逐条反驳，把准备的论据全部摆出来", "表面平静接受，会后向相熟同事吐槽上级不公", "当场请上级具体指出需改进之处，并说会后再优化", "沉默接受，回去后反复回想，开始怀疑自己的能力"] },
+    { n: 2, s: "好友兴奋地向你展示他的创业计划，准备投入全部积蓄，但你看出其中有一个可能致命的漏洞。你会：", o: ["不打击热情，先大力肯定，再轻描淡写提一句「可以再想想风险」", "清晰、直接地指出你看到的漏洞，哪怕这会让他当场扫兴", "表示支持，相信他自己迟早会发现问题", "不当面说，私下联络其他朋友一起去劝"] },
+    { n: 3, s: "同事在你背后散布了关于你的不实传言，今天你们要一起完成一个紧急项目。你会：", o: ["先把项目做完，找一个双方都平静的时机当面澄清此事", "立刻当面对质，要求对方道歉后再谈工作", "装作不知情，但在合作中处处提防、保留证据", "把这件事告诉共同上级，让上级处理"] },
+    { n: 4, s: "你正经历低谷，一位朋友安慰你说「别想太多，这没什么大不了的」。你内心真实的感受更可能是：", o: ["觉得被理解，心情确实轻松了一些", "表面感谢，但其实觉得自己的感受被轻描淡写带过了", "有点恼火，认为对方根本没懂", "开始怀疑是不是自己反应过度了"] },
+    { n: 5, s: "团队成员小张连续两周状态低迷、频繁出错，但从不主动说原因。作为同伴，你最可能：", o: ["直接问他「你是不是最近遇到什么事了」，给他一个开口的机会", "不点破，先默默帮他分担一部分工作，观察一阵", "提醒他注意工作质量，把问题就事论事地说清", "觉得这是他个人的事，不便介入"] },
+    { n: 6, s: "你和伴侣争吵，对方说了一句很伤人的话后摔门而出。半小时后对方回来了，但一言不发。你会：", o: ["主动开口：「刚才我们都说了气话，我们能平静聊聊吗？」", "等对方先开口，不想显得是自己理亏", "继续做自己的事，用沉默表达你还在生气", "旧事重提，把刚才那句伤人的话再追究一遍"] },
+    { n: 7, s: "你在一个新群体中，发现大家聊的话题你完全不熟悉，气氛热烈而你被晾在一边。你更可能：", o: ["坦然说「这个我不太懂，能给我讲讲吗」，把劣势变成提问的机会", "假装也懂，附和着点头微笑", "安静旁听，等出现自己熟悉的话题再加入", "找借口先离开这个场合"] },
+    { n: 8, s: "下属交上来的报告质量明显下降，而你知道他最近家里出了事。你需要给反馈，你会：", o: ["先肯定他过去的表现，再指出问题，最后问一句近况", "只就报告本身给出具体的修改要求，不提家事", "暂时不提报告问题，先关心他的状态", "既指出问题，也明确告诉他「如果需要时间或帮助可以说」"] },
+    { n: 9, s: "你升职了，而一起竞争的好友落选，对方主动来祝贺你，笑容里有一丝勉强。你会：", o: ["热情道谢，主动提议改天一起吃饭聊聊", "察觉到对方的勉强，淡化自己的喜悦，把话题转开", "真诚道谢，同时不刻意回避，自然地说「这次也很险，你的方案很多地方比我强」", "假装没看出异样，正常接受祝贺"] },
+    { n: 10, s: "你正在专注完成一个截止在即的任务，家人突然打电话来反复倾诉一件让他烦心的小事。你会：", o: ["耐心听完，哪怕任务受影响", "直接说「我现在很忙，晚点再说」然后挂断", "简短回应情绪，约定一个具体时间再细聊：「听起来很烦，我手头有个急事，七点打给你好好聊？」", "一边敷衍地「嗯嗯」，一边继续干活"] },
+    { n: 11, s: "会议上两位同事因意见不合气氛剑拔弩张，而你是中立方。你最可能：", o: ["沉默，等他们自己平息", "先点出双方各自有道理的地方，再把讨论拉回到共同目标上", "明确支持你认为更对的一方，尽快结束争论", "提议「先暂停，大家冷静一下再继续」"] },
+    { n: 12, s: "你发现自己最近经常无缘由地烦躁、对小事发火。你更可能：", o: ["提醒自己「忍一忍就过去了」，尽量不发作", "停下来想想，最近是不是睡眠、压力或某件未处理的事在影响我", "觉得是周围的人和事确实太烦，问题不在自己", "找朋友倾诉，把烦躁宣泄出来"] },
+    { n: 13, s: "一位平时强势的领导，在一次私下交流中突然流露出疲惫和自我怀疑。你会：", o: ["安慰他「您已经做得很好了，别担心」", "安静地听，不急于评价或给建议，让他把话说完", "立刻给出几条解决问题的具体建议", "觉得不太自然，尽快把话题转回工作"] },
+    { n: 14, s: "你答应了帮朋友一个忙，但事后发现这会严重挤占你自己的重要安排。你会：", o: ["硬着头皮履行承诺，毕竟答应了", "尽快联系朋友，坦诚说明情况并一起商量替代方案", "找个理由临时推掉，避免说出真实原因", "勉强去做，但心里埋怨，事后向别人抱怨"] },
+    { n: 15, s: "团队庆功宴上，气氛很高，但你注意到角落里有位贡献很大却内向的同事一直沉默。你会：", o: ["不打扰，每个人放松的方式不同", "自然走过去和他聊两句，提到他这次的关键贡献", "在众人面前大声表扬他，让大家为他鼓掌", "觉得他应该自己融入，不需要别人照顾"] },
+    { n: 16, s: "你收到一条措辞含糊的消息，无法判断对方是在开玩笑还是真的生气了。你会：", o: ["按「对方在生气」来回应，先道歉再说", "按「对方在开玩笑」来回应，轻松地接梗", "直接问对方「我有点拿不准你是认真的还是开玩笑，能说清楚点吗」", "暂时不回，等对方进一步表态"] },
+    { n: 17, s: "你长期努力的一个目标突然失败了，巨大的失落涌上来。当晚你最可能：", o: ["强迫自己马上振作，列出下一步计划", "允许自己难过一段时间，但给自己定一个「调整期限」", "反复回想哪里做错了，难以入睡", "找各种娱乐让自己彻底不去想这件事"] },
+    { n: 18, s: "一位新同事在你面前贬低了另一位你尊重的前辈。你会：", o: ["附和着聊几句，避免气氛尴尬", "不评论那位前辈，但平和地说出你自己接触下来的不同印象", "当场反驳，维护前辈", "沉默，但从此对这位新同事心存芥蒂"] },
+    { n: 19, s: "你正在气头上，需要回复一封会影响重要关系的邮件。你会：", o: ["趁着情绪清晰，立刻把想说的都写出来发出去", "先写下来但不发送，等情绪平复后再读一遍、修改后再发", "等彻底冷静（哪怕几天）再处理，先放着", "让别人替你看一遍把关再发"] },
+    { n: 20, s: "朋友向你哭诉一段感情，而你早就看出对方并不合适。此刻她只是想倾诉，并没问你意见。你会：", o: ["趁机劝她「早该分了」，把你的判断说出来", "先专注地接住她的情绪，暂时不评判对错", "一边听一边委婉地引导她「自己看清」问题", "听完后给出你认为最理性的分手建议"] },
+    { n: 21, s: "你察觉到自己对某位同事有种说不清的反感，但对方并没做错什么。你会：", o: ["尽量避免和他接触，眼不见为净", "反思这种反感从何而来，是否与自己的某些经历或偏见有关", "认为直觉往往准，对他多加防备", "努力对他更友善，以补偿这种不公平的反感"] },
+    { n: 22, s: "公开演讲前你心跳加速、手心出汗。你对这种紧张的解读更接近：", o: ["「糟了，我太紧张了，可能会搞砸」", "「身体在为重要时刻调动能量，这股劲儿可以帮我表现得更好」", "「我必须让自己彻底平静下来才能上场」", "「别人会看出我紧张的，太丢脸了」"] },
+    { n: 23, s: "你的建议被团队采纳并取得了成功，但功劳被组长在汇报中归到了自己名下。你会：", o: ["忍下来，毕竟撕破脸不值得", "找一个合适的私下场合，平静而清楚地向组长表达你的感受和诉求", "在更大的场合「不经意」地提及这其实是你的主意", "从此对这个团队心灰意冷，减少投入"] },
+    { n: 24, s: "你最好的朋友最近交了新朋友，明显和你疏远了。你心里不太好受。你会：", o: ["也疏远他，对等地减少联系", "坦诚地找机会告诉他「最近觉得有点想你了」，而不是指责他", "把这种失落压下去，告诉自己「人都会变」", "旁敲侧击地试探，看他是否还在乎这段友谊"] },
+    { n: 25, s: "你带的实习生第一次独立汇报，紧张到声音发抖、逻辑也乱了。汇报一结束，你会：", o: ["当众给出鼓励，把不足留到私下再说", "当场就把逻辑问题指出来，趁热打铁", "私下先肯定他敢于尝试，再具体说哪里可以改进", "什么都不说，让他自己慢慢成长"] },
+    { n: 26, s: "一个让你非常愤怒的人正站在你面前等你回应。你深知「冲动会坏事」。你会：", o: ["压住怒火，假装无所谓", "承认「我现在很生气，需要一点时间，我们等会儿再谈」", "把怒火转化成冷冰冰的、带刺的客气", "直接表达愤怒，让对方知道后果"] },
+    { n: 27, s: "你注意到一位平时开朗的朋友，最近朋友圈的内容透出一种不易察觉的消沉。你会：", o: ["不确定是否多想，先观察，不贸然行动", "找个轻松的由头约他见面或通话，给他一个开口的空间", "直接发消息问「你是不是抑郁了，要不要去看医生」", "在他朋友圈下留一句鼓励的话"] },
+    { n: 28, s: "团队决策时，大多数人都倾向于一个你认为有风险的方案，气氛已趋向一致。你会：", o: ["服从多数，不当那个扫兴的人", "清楚地说出你的担忧和依据，即使可能被认为是「唱反调」", "私下找几个关键的人单独表达顾虑", "投赞成票，但事后在执行中保留意见"] },
+    { n: 29, s: "你向一个人道了歉，对方却并不接受，态度依然冷淡。你会：", o: ["觉得自己已经做了该做的，对方的反应不归我管", "不再纠缠于「让对方原谅」，但理解对方需要时间，给彼此空间", "继续反复道歉，直到对方态度软化", "觉得对方小题大做，开始后悔道歉"] },
+    { n: 30, s: "你在一件事上明显判断失误，导致团队返工。复盘会上，你会：", o: ["主动、具体地承认自己的失误并说明改进方式，不过度自责", "承认错误，同时强调当时的客观困难，分担一部分责任", "反复道歉、贬低自己，让大家都觉得不必再追究", "等别人先开口，再视情况决定承认到什么程度"] }
+  ];
+
+  // Part 1 scores [A,B,C,D] index matches P1Q order
+  var P1S = [
+    [1,1,3,0],[1,3,0,1],[3,1,1,0],[1,3,1,0],[3,2,1,0],
+    [3,1,0,0],[3,1,2,0],[2,1,1,3],[2,1,3,0],[1,0,3,1],
+    [0,3,1,2],[1,3,0,1],[1,3,1,0],[1,3,0,0],[1,3,1,0],
+    [0,0,3,1],[1,3,0,1],[0,3,1,1],[0,3,2,1],[0,3,1,1],
+    [0,3,1,1],[0,3,1,0],[1,3,0,0],[0,3,1,1],[1,1,3,0],
+    [1,3,0,1],[1,3,0,1],[0,3,2,1],[1,3,1,0],[3,2,0,1]
+  ];
+
+  var P2Q = [
+    { n: 31, s: "当我情绪激动时，我通常能说清自己具体是什么情绪、因何而起。", rev: false },
+    { n: 32, s: "别人很难从我的表情或语气中看出我的真实情绪。", rev: true },
+    { n: 33, s: "我能较快从挫折或失望中恢复过来。", rev: false },
+    { n: 34, s: "当我心情不好时，我往往要很久之后才意识到自己情绪不对。", rev: true },
+    { n: 35, s: "我能敏锐地察觉到一群人之间气氛的微妙变化。", rev: false },
+    { n: 36, s: "别人向我倾诉烦恼时，我常常急于给建议，而不是先理解他的感受。", rev: true },
+    { n: 37, s: "即使在压力下，我也能保持思路清晰、不被情绪牵着走。", rev: false },
+    { n: 38, s: "我经常事后才后悔自己在情绪冲动时说的话。", rev: true },
+    { n: 39, s: "我能根据不同对象，调整自己表达情绪的方式。", rev: false },
+    { n: 40, s: "我很难理解为什么别人会因为某些「小事」而难过。", rev: true },
+    { n: 41, s: "我能在自己彻底失控之前，察觉到情绪正在升温。", rev: false },
+    { n: 42, s: "当我全力以赴的事失败时，我会长时间陷在自我否定里。", rev: true },
+    { n: 43, s: "我能分辨出别人嘴上说的和心里真正想要的之间的差别。", rev: false },
+    { n: 44, s: "面对让我焦虑的事，我倾向于回避而不是处理。", rev: true },
+    { n: 45, s: "我能用恰当的方式安抚一个正在崩溃的人，而不只是说「别哭了」。", rev: false },
+    { n: 46, s: "我常常说不清自己到底为什么会有某种情绪。", rev: true },
+    { n: 47, s: "当我需要时，我能调动起做某件枯燥但重要之事的动力。", rev: false },
+    { n: 48, s: "我倾向于压抑负面情绪，假装它们不存在。", rev: true }
+  ];
+
+  // Part 3: options pre-shuffled; c = correctIdx (0-based)
+  var P3Q = [
+    { n: 49, s: "一个人在被表扬后，却显得有些不自在、回避眼神、急着转移话题。这最可能反映：",
+      o: ["他没听清", "他不喜欢这个表扬", "他可能感到不配得，或不擅长接受正面关注", "他在假装谦虚"], c: 2 },
+    { n: 50, s: "「又惊又喜」这种感受说明：",
+      o: ["这个人情绪不稳定", "惊和喜是同一种情绪", "情绪是可以同时存在、甚至看似矛盾地交织的", "一个人同一时刻只能有一种情绪"], c: 2 },
+    { n: 51, s: "一个人长期把愤怒「压下去」，更可能出现的是：",
+      o: ["他会变得越来越平和", "愤怒可能转化为对自己的攻击（如自责、抑郁），或在无关的小事上突然爆发", "他会忘记自己曾经生气", "愤怒会自然消失"], c: 1 },
+    { n: 52, s: "当一个人说「我没事」，但语速变快、笑容僵硬、不断看手机时，更合理的判断是：",
+      o: ["应该完全相信他说的话", "他在玩手机所以分心了", "言语和非言语线索矛盾时，非言语信号往往更接近真实状态", "他确实没事"], c: 2 },
+    { n: 53, s: "嫉妒这种情绪，其背后往往隐藏着：",
+      o: ["没有任何意义", "对自己所看重、却感到缺乏之物的渴望与不安", "纯粹的恶意", "对对方的恨"], c: 1 },
+    { n: 54, s: "一个孩子摔倒后，先看向父母的脸色才决定要不要哭。这说明：",
+      o: ["孩子在撒娇", "孩子不是真的疼", "父母太严厉", "人会通过观察他人的情绪反应来判断该如何感受（情绪具有社会参照性）"], c: 3 },
+    { n: 55, s: "「焦虑」和「兴奋」在身体上的反应（心跳加快、出汗、能量升高）高度相似，主要区别常常在于：",
+      o: ["兴奋不会出汗", "焦虑的人心跳更快", "两者毫无关系", "个体对这种生理唤起的解读不同（视为威胁还是机遇）"], c: 3 },
+    { n: 56, s: "当你对某人长期的善意突然产生强烈反感时，更值得优先考虑的可能性是：",
+      o: ["你的直觉永远正确", "这种反应可能触动了你自己未被察觉的情结、比较或亏欠感", "应当立刻与对方绝交", "对方一定做错了什么"], c: 1 }
+  ];
+
+  // Dimensions: question numbers and max scores
+  var DIMS = [
+    { name: "情绪感知", qs: [4,9,16,27,35,43,49,52], max: 30 },
+    { name: "情绪理解", qs: [50,51,53,54,55,56],      max: 24 },
+    { name: "情绪运用", qs: [7,22,47],                max: 11 },
+    { name: "自我情绪管理", qs: [1,12,17,19,26,33,37,38,41,42,44,48], max: 50 },
+    { name: "人际情绪管理", qs: [3,5,6,8,11,13,15,18,23,25,28,39,45], max: 43 },
+    { name: "共情",         qs: [4,10,13,20,24,36,40,45], max: 30 },
+    { name: "自我觉察",     qs: [12,21,29,30,31,34,46,56], max: 31 }
+  ];
+
+  var LABELS = ['A','B','C','D'];
+  var TOTAL_QUESTIONS = 56;
+
+  // ─── Render ──────────────────────────────────────────────────────
+
+  function renderQuiz(root) {
+    var h = '';
+
+    h += '<h1 style="font-size:1.4rem;font-weight:500;letter-spacing:0.04em;margin-bottom:1rem;">情商（情绪智力）综合测评</h1>';
+
+    h += '<div class="eq-intro-box">';
+    h += '<strong>作答须知</strong>';
+    h += '<ul>';
+    h += '<li>全程约 25–35 分钟，请在不被打扰的环境中独立完成。</li>';
+    h += '<li>凭第一直觉作答，不要反复揣测「哪个看起来更高情商」。</li>';
+    h += '<li>按你真实会有的反应作答，而非你认为「应该」做的。</li>';
+    h += '<li>所有题目没有明显正确答案，如实选择即可。</li>';
+    h += '</ul></div>';
+
+    h += '<div class="eq-progress-bar" id="eq-progress">';
+    h += '已作答 <span id="eq-answered-count">0</span> / ' + TOTAL_QUESTIONS + ' 题';
+    h += '<div class="eq-progress-inner" id="eq-progress-fill" style="width:0%"></div>';
+    h += '</div>';
+
+    h += '<form id="eq-form" novalidate>';
+
+    // Part 1
+    h += '<div class="eq-section-head">第一部分 · 情境判断题（共 30 题）</div>';
+    h += '<p class="eq-section-note">每题选择一个最符合你真实反应的选项。</p>';
+    P1Q.forEach(function(q, i) {
+      h += '<div class="eq-q" id="eq-q' + q.n + '">';
+      h += '<p style="margin:0 0 0.7rem;font-weight:500;font-size:0.95rem;">' + q.n + '. ' + q.s + '</p>';
+      h += '<div>';
+      q.o.forEach(function(opt, j) {
+        h += '<label class="eq-option" data-name="q' + q.n + '">';
+        h += '<input type="radio" name="q' + q.n + '" value="' + LABELS[j] + '">';
+        h += '<span><strong>' + LABELS[j] + '.</strong> ' + opt + '</span>';
+        h += '</label>';
+      });
+      h += '</div></div>';
+    });
+
+    // Part 2
+    h += '<div class="eq-section-head">第二部分 · 自我陈述题（共 18 题）</div>';
+    h += '<p class="eq-section-note">请根据每句话与你的符合程度选择：<strong>1 = 完全不符合 &nbsp; 5 = 完全符合</strong></p>';
+    P2Q.forEach(function(q) {
+      h += '<div class="eq-q" id="eq-q' + q.n + '">';
+      h += '<p style="margin:0 0 0.7rem;font-weight:500;font-size:0.95rem;">' + q.n + '. ' + q.s + '</p>';
+      h += '<div class="eq-likert-row">';
+      h += '<span class="eq-likert-label">完全不符合</span>';
+      h += '<div class="eq-likert-options">';
+      for (var v = 1; v <= 5; v++) {
+        h += '<label class="eq-likert-opt" data-name="q' + q.n + '">';
+        h += '<input type="radio" name="q' + q.n + '" value="' + v + '">';
+        h += '<span>' + v + '</span>';
+        h += '</label>';
+      }
+      h += '</div>';
+      h += '<span class="eq-likert-label">完全符合</span>';
+      h += '</div></div>';
+    });
+
+    // Part 3
+    h += '<div class="eq-section-head">第三部分 · 情绪识别与理解题（共 8 题）</div>';
+    h += '<p class="eq-section-note">测量对情绪线索与情绪规律的理解，每题选一个最恰当的答案。</p>';
+    P3Q.forEach(function(q) {
+      h += '<div class="eq-q" id="eq-q' + q.n + '">';
+      h += '<p style="margin:0 0 0.7rem;font-weight:500;font-size:0.95rem;">' + q.n + '. ' + q.s + '</p>';
+      h += '<div>';
+      q.o.forEach(function(opt, j) {
+        h += '<label class="eq-option" data-name="q' + q.n + '">';
+        h += '<input type="radio" name="q' + q.n + '" value="' + j + '">';
+        h += '<span><strong>' + LABELS[j] + '.</strong> ' + opt + '</span>';
+        h += '</label>';
+      });
+      h += '</div></div>';
+    });
+
+    h += '<div class="eq-error" id="eq-error"></div>';
+    h += '<button type="submit" class="eq-submit-btn">查看我的结果 →</button>';
+    h += '</form>';
+
+    root.innerHTML = h;
+
+    // Live progress update
+    root.addEventListener('change', function(e) {
+      if (e.target && e.target.type === 'radio') {
+        updateProgress();
+        // Highlight selected label
+        var name = e.target.name;
+        root.querySelectorAll('label[data-name="' + name + '"]').forEach(function(lbl) {
+          lbl.classList.remove('is-selected');
+        });
+        var parentLabel = e.target.closest('label');
+        if (parentLabel) parentLabel.classList.add('is-selected');
+        // Remove highlight from the question card
+        var qCard = document.getElementById('eq-q' + name.slice(1));
+        if (qCard) qCard.classList.remove('unanswered-highlight');
+      }
+    });
+
+    // Form submit
+    document.getElementById('eq-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      var answers = {};
+      new FormData(this).forEach(function(val, key) { answers[key] = val; });
+
+      var answeredCount = Object.keys(answers).length;
+      if (answeredCount < TOTAL_QUESTIONS) {
+        var errorEl = document.getElementById('eq-error');
+        errorEl.style.display = 'block';
+        errorEl.textContent = '还有 ' + (TOTAL_QUESTIONS - answeredCount) + ' 题未作答，请完成所有题目后再提交。';
+
+        // Highlight first unanswered question
+        var allNames = []
+          .concat(P1Q.map(function(q) { return 'q' + q.n; }))
+          .concat(P2Q.map(function(q) { return 'q' + q.n; }))
+          .concat(P3Q.map(function(q) { return 'q' + q.n; }));
+        var firstUnanswered = null;
+        for (var i = 0; i < allNames.length; i++) {
+          if (!answers[allNames[i]]) {
+            var card = document.getElementById('eq-' + allNames[i]);
+            if (card) {
+              card.classList.add('unanswered-highlight');
+              if (!firstUnanswered) firstUnanswered = card;
+            }
+          }
+        }
+        if (firstUnanswered) firstUnanswered.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      var result = calculateScores(answers);
+      showResults(root, result);
+      root.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
+
+  function updateProgress() {
+    var answered = document.querySelectorAll('#eq-form input[type="radio"]:checked').length;
+    var countEl = document.getElementById('eq-answered-count');
+    var fillEl = document.getElementById('eq-progress-fill');
+    if (countEl) countEl.textContent = answered;
+    if (fillEl) fillEl.style.width = Math.round(answered / TOTAL_QUESTIONS * 100) + '%';
+  }
+
+  // ─── Scoring ─────────────────────────────────────────────────────
+
+  function calculateScores(answers) {
+    var scores = {};
+
+    // Part 1
+    P1Q.forEach(function(q, i) {
+      var ans = answers['q' + q.n];
+      var idx = LABELS.indexOf(ans);
+      scores[q.n] = idx >= 0 ? P1S[i][idx] : 0;
+    });
+
+    // Part 2
+    P2Q.forEach(function(q) {
+      var val = parseInt(answers['q' + q.n] || '3', 10);
+      scores[q.n] = q.rev ? (6 - val) : val;
+    });
+
+    // Part 3
+    P3Q.forEach(function(q) {
+      var val = parseInt(answers['q' + q.n] !== undefined ? answers['q' + q.n] : '-1', 10);
+      scores[q.n] = val === q.c ? 4 : 0;
+    });
+
+    var p1Total = P1Q.reduce(function(s, q) { return s + (scores[q.n] || 0); }, 0);
+    var p2Total = P2Q.reduce(function(s, q) { return s + (scores[q.n] || 0); }, 0);
+    var p3Total = P3Q.reduce(function(s, q) { return s + (scores[q.n] || 0); }, 0);
+    var total = p1Total + p2Total + p3Total;
+    var pct = Math.round(total / 212 * 100);
+
+    // Dimension scores
+    var dimScores = DIMS.map(function(d) {
+      var got = d.qs.reduce(function(s, qn) { return s + (scores[qn] || 0); }, 0);
+      return { name: d.name, got: got, max: d.max, pct: Math.round(got / d.max * 100) };
+    });
+
+    // L-scale validity
+    var flags = [];
+    var r33 = parseInt(answers['q33'] || '0', 10);
+    var r42 = parseInt(answers['q42'] || '0', 10);
+    var r38 = parseInt(answers['q38'] || '0', 10);
+    var r48 = parseInt(answers['q48'] || '0', 10);
+    var r32 = parseInt(answers['q32'] || '0', 10);
+
+    if (r33 === 5 && r42 === 1) flags.push('第33题选5且第42题选1（极速恢复挫折，且从不陷入自我否定）');
+    if (r38 === 1) flags.push('第38题选1（声称从不后悔冲动时说的话）');
+    if (r48 === 1 && r32 === 5) flags.push('第48题选1且第32题选5（毫不压抑情绪，他人却完全看不出——逻辑矛盾）');
+
+    var p1MaxCount = P1Q.filter(function(q, i) {
+      var idx = LABELS.indexOf(answers['q' + q.n]);
+      return idx >= 0 && P1S[i][idx] === 3;
+    }).length;
+    if (p1MaxCount / 30 > 0.85) {
+      flags.push('第一部分满分项比例过高（' + p1MaxCount + '/30，近乎完美）');
+    }
+
+    return { scores: scores, p1Total: p1Total, p2Total: p2Total, p3Total: p3Total, total: total, pct: pct, dimScores: dimScores, validityFlags: flags };
+  }
+
+  // ─── Results ─────────────────────────────────────────────────────
+
+  function getLevel(pct) {
+    if (pct >= 85) return { label: '很高', desc: '情绪识别、理解与调节能力整合度高，在压力与人际情境中表现稳定。' };
+    if (pct >= 70) return { label: '较高', desc: '大多数情境处理得当，少数高压或冲突情境仍有提升空间。' };
+    if (pct >= 55) return { label: '中等', desc: '具备基本情绪能力，在自我调节或共情某一环节存在明显短板。' };
+    if (pct >= 40) return { label: '偏低', desc: '易被情绪驱动或回避情绪，建议在具体维度上有针对性练习。' };
+    return { label: '低', desc: '多个维度均需系统性提升；若伴随长期困扰，建议寻求专业支持。' };
+  }
+
+  function showResults(root, result) {
+    var level = getLevel(result.pct);
+    var h = '';
+
+    h += '<h1 style="font-size:1.4rem;font-weight:500;letter-spacing:0.04em;margin-bottom:1.25rem;">测评结果</h1>';
+
+    if (result.validityFlags.length >= 3) {
+      h += '<div class="eq-validity-box">';
+      h += '<strong>效度提示</strong>（触发 ' + result.validityFlags.length + ' 条警示）<br>';
+      h += '本次结果可能反映「理想自我形象」而非真实水平。建议放松后重测，或思考「为什么想呈现这样的形象」。';
+      h += '</div>';
+    }
+
+    // Score card
+    h += '<div class="eq-card" style="text-align:center;">';
+    h += '<div class="eq-score-big">' + result.pct + '<span class="eq-score-sup">%</span></div>';
+    h += '<div style="font-size:0.85rem;color:var(--color-muted);margin:0.2rem 0 0.5rem;">总得分 ' + result.total + ' / 212</div>';
+    h += '<div class="eq-level-badge">情商水平：' + level.label + '</div>';
+    h += '<p style="margin:0;font-size:0.88rem;color:var(--color-muted);">' + level.desc + '</p>';
+    h += '</div>';
+
+    // Radar chart
+    h += '<div class="eq-radar-wrap"><canvas id="eq-radar" width="400" height="400"></canvas></div>';
+
+    // Dimension breakdown
+    h += '<div class="eq-card">';
+    h += '<p style="margin:0 0 1rem;font-weight:500;font-size:0.95rem;">七维得分详情</p>';
+    result.dimScores.forEach(function(d) {
+      h += '<div class="eq-dim-row">';
+      h += '<div class="eq-dim-meta"><span>' + d.name + '</span><span class="eq-dim-muted">' + d.got + '/' + d.max + ' · ' + d.pct + '%</span></div>';
+      h += '<div class="eq-bar-track"><div class="eq-bar-fill" style="width:' + d.pct + '%"></div></div>';
+      h += '</div>';
+    });
+    h += '</div>';
+
+    // Sub-scores
+    h += '<div class="eq-card">';
+    h += '<p style="margin:0 0 0.75rem;font-weight:500;font-size:0.95rem;">分部得分</p>';
+    h += '<div class="eq-sub-grid">';
+    h += '<div><div class="eq-sub-num">' + result.p1Total + '<span style="font-size:0.8rem;">/90</span></div><div class="eq-sub-label">情境判断</div></div>';
+    h += '<div><div class="eq-sub-num">' + result.p2Total + '<span style="font-size:0.8rem;">/90</span></div><div class="eq-sub-label">自我陈述</div></div>';
+    h += '<div><div class="eq-sub-num">' + result.p3Total + '<span style="font-size:0.8rem;">/32</span></div><div class="eq-sub-label">知识理解</div></div>';
+    h += '</div></div>';
+
+    h += '<div style="font-size:0.8rem;color:var(--color-muted);text-align:center;margin-bottom:1rem;line-height:1.7;">本测评为教育与自我发展用途，未经大规模常模标定，结果仅供参考。</div>';
+    h += '<button class="eq-reset-btn" id="eq-reset-btn">重新测评</button>';
+
+    root.innerHTML = h;
+
+    document.getElementById('eq-reset-btn').addEventListener('click', function() {
+      renderQuiz(root);
+      root.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    loadChartJS().then(function() {
+      drawRadar(result.dimScores);
+    });
+  }
+
+  function loadChartJS() {
+    if (window.Chart) return Promise.resolve();
+    return new Promise(function(resolve, reject) {
+      var s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js';
+      s.onload = resolve;
+      s.onerror = reject;
+      document.head.appendChild(s);
+    });
+  }
+
+  function drawRadar(dimScores) {
+    var canvas = document.getElementById('eq-radar');
+    if (!canvas) return;
+    var isDark = document.documentElement.dataset.theme === 'dark';
+    var fg = isDark ? '#d0ccbd' : '#434343';
+    var fgAlpha = isDark ? 'rgba(208,204,189,0.18)' : 'rgba(67,67,67,0.12)';
+    var gridColor = isDark ? 'rgba(208,204,189,0.15)' : 'rgba(67,67,67,0.12)';
+
+    new window.Chart(canvas, {
+      type: 'radar',
+      data: {
+        labels: dimScores.map(function(d) { return d.name; }),
+        datasets: [{
+          data: dimScores.map(function(d) { return d.pct; }),
+          backgroundColor: fgAlpha,
+          borderColor: fg,
+          borderWidth: 1.5,
+          pointBackgroundColor: fg,
+          pointRadius: 3,
+          pointHoverRadius: 5
+        }]
+      },
+      options: {
+        responsive: true,
+        animation: { duration: 600 },
+        scales: {
+          r: {
+            min: 0,
+            max: 100,
+            ticks: { stepSize: 25, display: false, backdropColor: 'transparent' },
+            grid: { color: gridColor },
+            angleLines: { color: gridColor },
+            pointLabels: {
+              color: fg,
+              font: { size: 12 }
+            }
+          }
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: function(ctx) { return ctx.raw + '%'; }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // ─── Init ─────────────────────────────────────────────────────────
+
+  function initEQ() {
+    var root = document.getElementById('eq-root');
+    if (!root) return;
+    renderQuiz(root);
+  }
+
+  document.addEventListener('astro:page-load', initEQ);
+
+})();
+</script>
