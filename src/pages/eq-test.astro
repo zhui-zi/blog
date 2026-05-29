@@ -598,6 +598,118 @@ import { SITE } from "@/config";
     return { p1:p1, p2:p2, p3:p3, tot:tot, pct:pct, dims:dims, flags:flags };
   }
 
+  // ─── Dimension advice ────────────────────────────────────────────
+
+  var DIM_ADVICE = {
+    "情绪感知": {
+      high: "对情绪细节的敏锐度是你的自然优势——他人未说出口的感受，你往往先察觉到。这让你在关系中更容易建立真实的连接，也更难被表面现象带偏。",
+      low:  "练习「情绪精确命名」：当感受出现时，不用「不好」或「难受」打发，而是多问一层——是委屈、失落、被忽视，还是不甘心？名字越精确，应对方式越清晰。"
+    },
+    "情绪理解": {
+      high: "你对情绪规律有较好的概念性理解，不容易被表面情绪迷惑，能更准确地解读行为背后的原因，也更难陷入「对方为什么这样」的困惑中。",
+      low:  "情绪往往是需求未被满足的信号。当自己或他人出现某种情绪时，试着往下问一层：「这个情绪在说，什么对我（他）来说真的很重要？」"
+    },
+    "情绪运用": {
+      high: "你能把当下的情绪状态转化为行动的燃料，在压力中找到节奏、在兴奋时维持判断——情绪对你而言不只是要管理的东西，而是可用的资源。",
+      low:  "情绪不只是干扰，也可以是动力来源。试着根据情绪匹配任务：焦虑时适合检查细节，兴奋时适合头脑风暴，平静时适合深度思考——顺势而为往往比强行集中更省力。"
+    },
+    "自我情绪管理": {
+      high: "即使在高压情境下，你也能维持基本的清醒和行动力，不容易被激动的情绪带偏判断。这种稳定性是周围人感到「可以依靠」的重要来源。",
+      low:  "在平静时建立你的「情绪急救清单」：提前想好 3 件能在激动时让你降温的具体事（如喝一杯水、写几行字、走到另一个房间）。关键是事先备好，而不是等情绪汹涌时再临时找方法。"
+    },
+    "人际情绪管理": {
+      high: "你懂得在关系中的情绪张力出现时灵活应对——何时共情、何时推进、何时划出边界，而不是一味迎合或正面硬碰。这让你在冲突后仍能维系关系。",
+      low:  "在关系冲突或他人情绪激烈时，先「命名当下」比急着解决问题更有效：「我感觉现在有些紧张，我们能先停一下吗？」这个动作本身就能让场面降温，为后续对话创造空间。"
+    },
+    "共情": {
+      high: "你有真实感受他人处境的能力，对方在你面前更容易感到被接住、不孤单，而不只是被分析或建议。这种品质在他人最脆弱时往往比任何方法都有力量。",
+      low:  "下次有人倾诉时，刻意把「给建议」的冲动延迟 5 分钟，先说：「听起来那段时间对你来说真的很难。」只是这一句——然后观察对方的反应和你们之间的变化。"
+    },
+    "自我觉察": {
+      high: "你对自己的情绪触发点、行为模式和内在动机有较清晰的认识——这是有意识改变的前提，也是让他人感到「你是真实的人」而非角色扮演的基础。",
+      low:  "从最小的记录开始：每次有强烈情绪反应后，写下 3 件事——发生了什么 / 我的感受是什么 / 我做了什么。不用分析，只是如实记录。坚持几周，规律会自己浮现出来。"
+    }
+  };
+
+  function buildAdvice(dims, pct) {
+    var sorted = dims.slice().sort(function(a, b) { return b.pct - a.pct; });
+    var top2    = sorted.slice(0, 2);
+    var bottom2 = sorted.slice(-2).reverse();
+
+    // Level-based opener
+    var opener;
+    if (pct >= 85) opener = "你在各维度上的发展相对均衡，已经能在大多数情境中稳定运用这些能力。真正的挑战往往来自极端压力、陌生情境，或你最在意的关系——那些才是检验深度的地方。";
+    else if (pct >= 70) opener = "你已经有扎实的情绪智力基础。下面的成长方向不是「弱点」，而是可以把好的变得更精。";
+    else if (pct >= 55) opener = "你有一些相当稳定的能力，同时也有一些比较明显的成长空间。这个阶段针对性地练习 2–3 个具体方向，比分散努力更有效。";
+    else if (pct >= 40) opener = "情绪在你的日常可能带来了一些阻力。值得注意的是，情绪智力是可以刻意培养的——从下面最小的一个行动开始，坚持两周，再扩展。";
+    else                opener = "多个维度同时需要关注。建议把重心先放在「自我觉察」——它是其他能力的地基。如果情绪困扰已经影响到日常生活，也建议考虑寻求专业支持。";
+
+    var h = '<div class="eq-card">';
+    h += '<p class="eq-card-title">给你的建议</p>';
+    h += '<p style="font-size:0.88rem;line-height:1.85;margin:0 0 1.4rem;">' + opener + '</p>';
+
+    // Strengths
+    h += '<p style="font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-muted);margin:0 0 0.75rem;">值得保持的优势</p>';
+    top2.forEach(function(d) {
+      h += '<div style="margin-bottom:1rem;">';
+      h += '<div style="display:flex;align-items:baseline;gap:0.5rem;margin-bottom:0.3rem;">';
+      h += '<span style="font-size:0.88rem;font-weight:500;">' + d.name + '</span>';
+      h += '<span style="font-size:0.75rem;color:var(--color-muted);">' + d.pct + '%</span>';
+      h += '</div>';
+      h += '<p style="font-size:0.85rem;line-height:1.78;color:var(--color-muted);margin:0;">' + (DIM_ADVICE[d.name] ? DIM_ADVICE[d.name].high : '') + '</p>';
+      h += '</div>';
+    });
+
+    // Divider
+    h += '<div style="height:1px;background:var(--color-border);margin:1.1rem 0;"></div>';
+
+    // Growth areas
+    h += '<p style="font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-muted);margin:0 0 0.75rem;">可以关注的成长方向</p>';
+    bottom2.forEach(function(d) {
+      h += '<div style="margin-bottom:1rem;">';
+      h += '<div style="display:flex;align-items:baseline;gap:0.5rem;margin-bottom:0.3rem;">';
+      h += '<span style="font-size:0.88rem;font-weight:500;">' + d.name + '</span>';
+      h += '<span style="font-size:0.75rem;color:var(--color-muted);">' + d.pct + '%</span>';
+      h += '</div>';
+      h += '<p style="font-size:0.85rem;line-height:1.78;margin:0;">' + (DIM_ADVICE[d.name] ? DIM_ADVICE[d.name].low : '') + '</p>';
+      h += '</div>';
+    });
+
+    // Profile pattern detection
+    var get = function(name) { return dims.find(function(d){return d.name===name;}); };
+    var selfM = get("自我情绪管理");
+    var empath = get("共情");
+    var interp = get("人际情绪管理");
+    var underst = get("情绪理解");
+    var percep = get("情绪感知");
+
+    var pattern = null;
+    if (selfM && empath && interp) {
+      var interpAvg = Math.round((empath.pct + interp.pct) / 2);
+      if (selfM.pct - interpAvg >= 22) {
+        pattern = "你的模式偏「对己有力、对人谨慎」——内在调节能力强，但在关系中可能习惯保持距离或控制表达。共情和人际管理的提升，往往不在于「变得更外向」，而在于允许自己更真实地靠近他人。";
+      } else if (interpAvg - selfM.pct >= 22) {
+        pattern = "你的模式偏「对人敏感、对己宽松」——很容易感受到他人的情绪，但自身的调节稍弱。注意避免过度吸收他人情绪，在照顾别人之前先检查自己的状态。";
+      }
+    }
+    if (!pattern && underst && selfM && percep) {
+      var actionAvg = Math.round((selfM.pct + percep.pct) / 2);
+      if (underst.pct - actionAvg >= 20) {
+        pattern = "你在情绪的知识和理论层面理解相当好，但在实际情境中的运用稍弱——「知道但做不到」的落差很常见。关键是把知识转化为可重复的小习惯，而不是等「用得上时再想起来」。";
+      }
+    }
+
+    if (pattern) {
+      h += '<div style="height:1px;background:var(--color-border);margin:1.1rem 0;"></div>';
+      h += '<div style="font-size:0.85rem;line-height:1.82;padding:0.9rem 1rem;';
+      h += 'background:color-mix(in srgb,var(--color-muted) 10%,var(--color-background) 90%);';
+      h += 'border-radius:4px;">' + pattern + '</div>';
+    }
+
+    h += '</div>';
+    return h;
+  }
+
   // ─── Results ─────────────────────────────────────────────────────
 
   function getLevel(pct) {
@@ -650,6 +762,9 @@ import { SITE } from "@/config";
       h += '<div><div class="eq-sub-score">'+it[1]+'<span class="eq-sub-unit">/'+it[2]+'</span></div><div class="eq-sub-lbl">'+it[0]+'</div></div>';
     });
     h += '</div></div>';
+
+    // Advice
+    h += buildAdvice(res.dims, res.pct);
 
     h += '<p class="eq-disclaimer">本测评为教育与自我发展用途，未经大规模常模标定，结果仅供参考。</p>';
     h += '<button class="eq-reset" id="eq-reset">重新测评</button>';
