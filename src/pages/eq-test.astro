@@ -600,6 +600,83 @@ import { SITE } from "@/config";
 
   // ─── Dimension advice ────────────────────────────────────────────
 
+  // ─── Science section ─────────────────────────────────────────────
+
+  function buildScience() {
+    var s = '';
+    var muted = 'color:var(--color-muted)';
+    var dim   = 'font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;' + muted + ';margin:0 0 0.6rem;';
+    var body  = 'font-size:0.85rem;line-height:1.85;';
+    var li    = 'margin-bottom:0.55rem;padding-left:0;';
+    var divider = '<div style="height:1px;background:var(--color-border);margin:1.2rem 0;"></div>';
+
+    s += '<div class="eq-card">';
+    s += '<p class="eq-card-title">关于情绪智力的科学背景</p>';
+
+    // 1. Theory
+    s += '<p style="' + dim + '">理论来源</p>';
+    s += '<p style="' + body + 'margin:0 0 0.75rem;">';
+    s += '本测评整合了三个学术框架。<strong>Mayer–Salovey–Caruso 四支能力模型</strong>（1990/1997）将情绪智力定义为可测量的认知能力，分为感知→运用→理解→管理四个层级，是目前学术界公认度最高的能力性模型。';
+    s += '<strong>Goleman 混合模型</strong>（1995）在此基础上加入了自我觉察、共情和社交技能，更贴近职场应用，但也被批评混入了人格特质成分。';
+    s += '<strong>Bar-On 情商模型</strong>（1997）则强调压力适应性与人际社会智力，为本测评的人际情绪管理维度提供了参考。';
+    s += '</p>';
+
+    // Dimension → theory mapping
+    s += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.4rem 1rem;font-size:0.82rem;margin-bottom:0.5rem;">';
+    var pairs = [
+      ['情绪感知', 'MSC 第一支（感知）'],
+      ['情绪理解', 'MSC 第三支（理解）'],
+      ['情绪运用', 'MSC 第二支（运用）'],
+      ['自我情绪管理', 'MSC 第四支 × Goleman'],
+      ['人际情绪管理', 'Goleman × Bar-On'],
+      ['共情', 'Goleman × 社会神经科学'],
+      ['自我觉察', 'Goleman × MSC 第一支'],
+    ];
+    pairs.forEach(function(p) {
+      s += '<div style="display:flex;gap:0.4rem;align-items:baseline;">';
+      s += '<span style="font-weight:500;white-space:nowrap;">' + p[0] + '</span>';
+      s += '<span style="' + muted + ';font-size:0.78rem;">' + p[1] + '</span>';
+      s += '</div>';
+    });
+    s += '</div>';
+
+    s += divider;
+
+    // 2. Research findings
+    s += '<p style="' + dim + '">研究发现</p>';
+    s += '<ul style="margin:0;padding-left:1.1rem;' + body + '">';
+    var findings = [
+      '元分析研究（Van Rooy &amp; Viswesvaran, 2004）显示，EQ 对工作绩效的预测效度约为 <em>r</em> = 0.24，与认知能力（IQ）互补而非替代。',
+      '能力性 EQ（MSCEIT）与 IQ 呈中度相关（<em>r</em> ≈ 0.35），与大五人格相关性较低，表明情绪智力是相对独立的心理构念（Mayer et al., 2004）。',
+      '较高的 EQ 与更好的人际关系满意度、更低的职业倦怠感、更强的冲突修复能力相关（Brackett et al., 2011）。',
+      '与 IQ 不同，EQ 是可训练的——针对性的情绪调节与共情训练能产生可测量的提升效果，且效果在训练结束后仍持续（Nelis et al., 2009）。',
+      '自我报告式 EQ 与能力性 EQ 的相关性较低（<em>r</em> ≈ 0.12–0.19），说明「自认为情商高」和「实际情绪处理能力强」并不等同。',
+    ];
+    findings.forEach(function(f) {
+      s += '<li style="' + li + '">' + f + '</li>';
+    });
+    s += '</ul>';
+
+    s += divider;
+
+    // 3. Measurement caveats
+    s += '<p style="' + dim + '">关于本次测量的说明</p>';
+    s += '<ul style="margin:0;padding-left:1.1rem;' + body + '">';
+    var caveats = [
+      '<strong>测量形式</strong>：本测评采用情境判断题（SJT）与自我陈述题混合形式。SJT 比纯自评问卷有更好的预测效度，但仍无法完全排除「知道正确答案」与「实际做到」之间的落差。',
+      '<strong>知识性偏差</strong>：熟悉情绪心理学的人更容易选出理论上合理的选项，这会在一定程度上拉高分数，但不一定反映真实的情绪处理能力。',
+      '<strong>文化背景</strong>：情绪表达和「恰当反应」的标准存在文化差异。本测评在中文情境下设计，可能不完全适用于所有文化背景。',
+      '<strong>状态影响</strong>：作答时的情绪状态、疲劳程度和环境都会影响结果。建议间隔至少三个月再次测评，以排除短期状态的干扰。',
+    ];
+    caveats.forEach(function(c) {
+      s += '<li style="' + li + '">' + c + '</li>';
+    });
+    s += '</ul>';
+
+    s += '</div>';
+    return s;
+  }
+
   var DIM_ADVICE = {
     "情绪感知": {
       high: "对情绪细节的敏锐度是你的自然优势——他人未说出口的感受，你往往先察觉到。这让你在关系中更容易建立真实的连接，也更难被表面现象带偏。",
@@ -765,6 +842,9 @@ import { SITE } from "@/config";
 
     // Advice
     h += buildAdvice(res.dims, res.pct);
+
+    // Science
+    h += buildScience();
 
     h += '<p class="eq-disclaimer">本测评为教育与自我发展用途，未经大规模常模标定，结果仅供参考。</p>';
     h += '<button class="eq-reset" id="eq-reset">重新测评</button>';
