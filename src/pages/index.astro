@@ -76,24 +76,6 @@ const sortedPosts = getSortedPosts(posts);
         <section id="recent-posts" class="pt-12 pb-6">
           <h2 class="text-2xl font-semibold tracking-wide">Posts</h2>
           <ul>
-            <li class="my-6">
-              <a
-                href="/eq-test"
-                class="inline-block text-lg font-medium text-accent decoration-dashed underline-offset-4 hover:underline"
-              >
-                <h3>情商（情绪智力）综合测评</h3>
-              </a>
-              <p>共 56 题，整合 Mayer-Salovey-Caruso、Goleman 与 Bar-On 三大框架，自动算分并生成七维能力雷达图。</p>
-            </li>
-            <li class="my-6">
-              <a
-                href="/sm-test"
-                class="inline-block text-lg font-medium text-accent decoration-dashed underline-offset-4 hover:underline"
-              >
-                <h3>支配—顺从倾向投射测验</h3>
-              </a>
-              <p>共 40 题，基于投射技术探索人际关系中的主导与顺从倾向，附一致性分析与详细解读。</p>
-            </li>
             {sortedPosts.map(
               (data, index) =>
                 index < SITE.postPerIndex && <Card variant="h3" {...data} />

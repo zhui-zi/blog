@@ -1,6 +1,8 @@
 ---
 import { type CollectionEntry, getCollection } from "astro:content";
 import PostDetails from "@/layouts/PostDetails.astro";
+import QuizEQ from "@/layouts/QuizEQ.astro";
+import QuizSM from "@/layouts/QuizSM.astro";
 import getSortedPosts from "@/utils/getSortedPosts";
 import { getPath } from "@/utils/getPath";
 
@@ -24,4 +26,6 @@ const posts = await getCollection("blog");
 const sortedPosts = getSortedPosts(posts);
 ---
 
-<PostDetails post={post} posts={sortedPosts} />
+{post.data.quizPage === 'eq' && <QuizEQ post={post} posts={sortedPosts} />}
+{post.data.quizPage === 'sm' && <QuizSM post={post} posts={sortedPosts} />}
+{!post.data.quizPage && <PostDetails post={post} posts={sortedPosts} />}

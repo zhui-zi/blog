@@ -59,28 +59,6 @@ const months = [
                     <sup class="text-xs">{monthGroup.length}</sup>
                   </div>
                   <ul>
-                    {year === "2026" && month === "5" && (
-                      <>
-                        <li class="my-6">
-                          <a
-                            href="/sm-test"
-                            class="inline-block text-lg font-medium text-accent decoration-dashed underline-offset-4 hover:underline"
-                          >
-                            <h2>支配—顺从倾向投射测验</h2>
-                          </a>
-                          <p>互动测验 · 共 40 题，探索人际关系中的主导与顺从倾向。</p>
-                        </li>
-                        <li class="my-6">
-                          <a
-                            href="/eq-test"
-                            class="inline-block text-lg font-medium text-accent decoration-dashed underline-offset-4 hover:underline"
-                          >
-                            <h2>情商（情绪智力）综合测评</h2>
-                          </a>
-                          <p>互动测评 · 共 56 题，自动算分并生成七维能力雷达图。</p>
-                        </li>
-                      </>
-                    )}
                     {monthGroup
                       .sort(
                         (a, b) =>

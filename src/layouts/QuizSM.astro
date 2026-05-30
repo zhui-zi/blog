@@ -1,0 +1,355 @@
+---
+import { type CollectionEntry } from "astro:content";
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import Tag from "@/components/Tag.astro";
+import BackButton from "@/components/BackButton.astro";
+import Datetime from "@/components/Datetime.astro";
+import { getPath } from "@/utils/getPath";
+import { slugifyStr } from "@/utils/slugify";
+import { getPostDescription } from "@/utils/getPostDescription";
+import { SITE } from "@/config";
+import IconChevronLeft from "@/assets/icons/IconChevronLeft.svg";
+import IconChevronRight from "@/assets/icons/IconChevronRight.svg";
+
+type Props = {
+  post: CollectionEntry<"blog">;
+  posts: CollectionEntry<"blog">[];
+};
+
+const { post, posts } = Astro.props;
+const { title, pubDatetime, modDatetime, timezone, tags } = post.data;
+const description = getPostDescription(post);
+
+const layoutProps = {
+  title: `${title} | ${SITE.title}`,
+  description,
+  pubDatetime,
+  modDatetime,
+  scrollSmooth: true,
+};
+
+const allPosts = posts.map(({ data: { title }, id, filePath }) => ({ id, title, filePath }));
+const currentIndex = allPosts.findIndex(a => a.id === post.id);
+const prevPost = currentIndex !== 0 ? allPosts[currentIndex - 1] : null;
+const nextPost = currentIndex !== allPosts.length - 1 ? allPosts[currentIndex + 1] : null;
+---
+
+<Layout {...layoutProps}>
+  <Header />
+  <BackButton />
+  <main id="main-content" class="app-layout pb-12">
+    <h1
+      transition:name={slugifyStr(title.replaceAll(".", "-"))}
+      class="inline-block text-2xl font-bold text-accent sm:text-3xl"
+    >{title}</h1>
+    <div class="mt-4 flex items-center gap-4 opacity-80 text-sm">
+      <Datetime {pubDatetime} {modDatetime} {timezone} size="sm" class="opacity-100" />
+    </div>
+    <hr class="mt-4 border-dashed border-border" />
+
+    <div id="sm-root"></div>
+
+    <hr class="my-8 border-dashed" />
+    <ul class="mt-4 mb-8 flex flex-wrap gap-4 sm:my-8">
+      {tags.map(tag => <Tag tag={slugifyStr(tag)} tagName={tag} size="sm" />)}
+    </ul>
+    <hr class="my-6 border-dashed" />
+    <div data-pagefind-ignore class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+      {prevPost && (
+        <a href={getPath(prevPost.id, prevPost.filePath)} class="flex w-full gap-1 hover:opacity-75">
+          <IconChevronLeft class="inline-block flex-none rtl:rotate-180" />
+          <div>
+            <span>Previous Post</span>
+            <div class="text-sm text-accent/85">{prevPost.title}</div>
+          </div>
+        </a>
+      )}
+      {nextPost && (
+        <a href={getPath(nextPost.id, nextPost.filePath)} class="flex w-full justify-end gap-1 text-end hover:opacity-75 sm:col-start-2">
+          <div>
+            <span>Next Post</span>
+            <div class="text-sm text-accent/85">{nextPost.title}</div>
+          </div>
+          <IconChevronRight class="inline-block flex-none rtl:rotate-180" />
+        </a>
+      )}
+    </div>
+  </main>
+  <Footer />
+</Layout>
+
+<style is:global>
+  #sm-root p, #sm-root h1, #sm-root h2 {
+    margin: 0; padding: 0;
+    font-size: inherit; font-weight: inherit; line-height: inherit;
+  }
+  #sm-root .sm-progress {
+    position: sticky; top: 0; z-index: 20;
+    background: var(--color-background);
+    border-bottom: 1px solid var(--color-border);
+    padding: 0.5rem 0 0; margin-bottom: 2rem;
+  }
+  #sm-root .sm-progress-text {
+    text-align: center; font-size: 0.8rem;
+    color: color-mix(in srgb, var(--color-foreground) 55%, var(--color-background) 45%);
+    padding-bottom: 0.4rem;
+  }
+  #sm-root .sm-progress-track { height: 2px; background: color-mix(in srgb, var(--color-muted) 40%, transparent); }
+  #sm-root .sm-progress-fill { height: 100%; background: var(--color-foreground); transition: width 0.35s ease; }
+  #sm-root .sm-section { margin-top: 3rem; margin-bottom: 1.75rem; }
+  #sm-root .sm-section-eyebrow {
+    font-size: 0.72rem; letter-spacing: 0.12em;
+    color: color-mix(in srgb, var(--color-foreground) 55%, var(--color-background) 45%);
+    text-transform: uppercase; margin: 0 0 0.35rem;
+  }
+  #sm-root .sm-section-title { font-size: 1.1rem; font-weight: 500; letter-spacing: 0.02em; margin: 0 0 0.4rem; padding-bottom: 0.6rem; border-bottom: 1px solid var(--color-border); }
+  #sm-root .sm-section-note { font-size: 0.83rem; color: color-mix(in srgb, var(--color-foreground) 55%, var(--color-background) 45%); margin: 0.5rem 0 0; line-height: 1.7; }
+  #sm-root .sm-q { border: 1px solid var(--color-border); border-radius: 5px; margin-bottom: 1.25rem; transition: border-color 0.2s; overflow: hidden; }
+  #sm-root .sm-q.unanswered-highlight { border-color: #b03a2e; box-shadow: 0 0 0 1px #b03a2e22; }
+  #sm-root .sm-q-head { padding: 1.1rem 1.25rem 0.85rem; display: flex; gap: 0.7rem; align-items: flex-start; }
+  #sm-root .sm-q-num { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.08em; color: color-mix(in srgb, var(--color-foreground) 55%, var(--color-background) 45%); min-width: 1.6rem; padding-top: 0.22rem; flex-shrink: 0; }
+  #sm-root .sm-q-stem { font-size: 0.93rem; line-height: 1.75; margin: 0; }
+  #sm-root .sm-opts { padding: 0 1.25rem 1.1rem; display: flex; flex-direction: column; gap: 0.45rem; }
+  #sm-root .sm-opt { display: flex; align-items: stretch; border: 1px solid var(--color-border); border-radius: 4px; cursor: pointer; overflow: hidden; transition: border-color 0.15s; user-select: none; }
+  #sm-root .sm-opt input[type="radio"] { position: absolute; opacity: 0; width: 0; height: 0; }
+  #sm-root .sm-opt-badge { display: flex; align-items: center; justify-content: center; min-width: 2.6rem; padding: 0.62rem 0; background: color-mix(in srgb, var(--color-muted) 18%, var(--color-background) 82%); border-right: 1px solid var(--color-border); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.04em; color: color-mix(in srgb, var(--color-foreground) 55%, var(--color-background) 45%); flex-shrink: 0; transition: background 0.15s, color 0.15s, border-color 0.15s; }
+  #sm-root .sm-opt-text { padding: 0.62rem 0.9rem; font-size: 0.88rem; line-height: 1.65; flex: 1; }
+  #sm-root .sm-opt:hover { border-color: color-mix(in srgb, var(--color-foreground) 55%, transparent); }
+  #sm-root .sm-opt:hover .sm-opt-badge { border-right-color: color-mix(in srgb, var(--color-foreground) 55%, transparent); }
+  #sm-root .sm-opt.is-selected { border-color: var(--color-foreground); }
+  #sm-root .sm-opt.is-selected .sm-opt-badge { background: var(--color-foreground); color: var(--color-background); border-right-color: var(--color-foreground); }
+  #sm-root .sm-opt.is-selected .sm-opt-text { font-weight: 500; }
+  #sm-root .sm-error { color: #b03a2e; font-size: 0.85rem; text-align: center; margin: 0.75rem 0; display: none; line-height: 1.6; }
+  #sm-root .sm-submit { display: block; margin: 2.5rem auto 0; padding: 0.75rem 2.75rem; background: var(--color-foreground); color: var(--color-background); border: none; border-radius: 4px; font-size: 0.95rem; font-family: var(--font-app); cursor: pointer; letter-spacing: 0.06em; transition: opacity 0.2s; }
+  #sm-root .sm-submit:hover { opacity: 0.82; }
+  #sm-root .sm-card { border: 1px solid var(--color-border); border-radius: 5px; padding: 1.25rem; margin-bottom: 1.25rem; }
+  #sm-root .sm-card-title { font-size: 0.72rem; letter-spacing: 0.1em; color: color-mix(in srgb, var(--color-foreground) 55%, var(--color-background) 45%); text-transform: uppercase; margin: 0 0 1.1rem; }
+  #sm-root .sm-level-pill { display: inline-block; padding: 0.22rem 1.1rem; border: 1px solid var(--color-border); border-radius: 2rem; font-size: 0.88rem; letter-spacing: 0.06em; margin-bottom: 0.7rem; }
+  #sm-root .sm-reset { display: block; margin: 1.5rem auto 0; padding: 0.6rem 1.75rem; background: transparent; color: var(--color-foreground); border: 1px solid var(--color-border); border-radius: 4px; font-size: 0.88rem; font-family: var(--font-app); cursor: pointer; letter-spacing: 0.04em; transition: background 0.15s; }
+  #sm-root .sm-reset:hover { background: color-mix(in srgb, var(--color-foreground) 7%, transparent); }
+  #sm-root .sm-disclaimer { font-size: 0.75rem; color: color-mix(in srgb, var(--color-foreground) 55%, var(--color-background) 45%); text-align: center; line-height: 1.7; margin: 1rem 0 0; }
+  #sm-root .sm-intro { border: 1px solid var(--color-border); border-radius: 5px; padding: 1.1rem 1.25rem; margin-bottom: 2.5rem; font-size: 0.87rem; line-height: 1.8; }
+  #sm-root .sm-intro-title { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: color-mix(in srgb, var(--color-foreground) 55%, var(--color-background) 45%); margin: 0 0 0.5rem; }
+  #sm-root .sm-intro ul { margin: 0; padding-left: 1.2rem; }
+  #sm-root .sm-intro li { margin-bottom: 0.15rem; }
+  #sm-root .sm-metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+  #sm-root .sm-metric-cell { padding: 0.85rem 1rem; background: color-mix(in srgb, var(--color-muted) 8%, var(--color-background) 92%); border-radius: 4px; }
+  #sm-root .sm-metric-label { font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: color-mix(in srgb, var(--color-foreground) 55%, var(--color-background) 45%); margin: 0 0 0.3rem; }
+  #sm-root .sm-metric-value { font-size: 1.2rem; font-weight: 300; }
+  #sm-root .sm-metric-note { font-size: 0.78rem; color: color-mix(in srgb, var(--color-foreground) 55%, var(--color-background) 45%); margin-top: 0.2rem; line-height: 1.5; }
+  @media (max-width: 420px) { #sm-root .sm-metric-grid { grid-template-columns: 1fr; } }
+</style>
+
+<script is:inline>
+(function () {
+  var PARTS = [
+    { eyebrow:'Part 1 · 词语联想', title:'词语联想（第 1–10 题）', note:'读到每个词时，最先被你吸引、或脑海里最先亮起来的那个画面是哪一个？',
+      qs:[
+        {n:1,s:'"路口"',o:['选一条，然后一直走下去','看看别人都往哪边走','停下来，先把四周看清楚']},
+        {n:2,s:'"风"',o:['顺着它走会省力','它能把东西吹去想去的地方','它来去都没人挡得住']},
+        {n:3,s:'"一张白纸"',o:['想看看别人会画什么','想在上面写下第一笔','这样空着也挺好']},
+        {n:4,s:'"钥匙"',o:['在等一把属于自己的','谁拿着钥匙，谁开门','钥匙总是配给某把锁的']},
+        {n:5,s:'"舞台"',o:['站在光里说话的那个人','台下看得入神的那个人','在后台决定灯怎么打的那个人']},
+        {n:6,s:'"河流"',o:['它自己会找到出海口','跟着水流漂下去','在某处筑一道坝']},
+        {n:7,s:'"地图"',o:['跟着已经标好的路线','自己画一条新的线','先看看这片区域有多大']},
+        {n:8,s:'"一扇半开的门"',o:['推开它','等它为我开到底','看看门后是谁']},
+        {n:9,s:'"沉默"',o:['那就先听着','总得有人先开口','沉默本身也是一种回答']},
+        {n:10,s:'"节拍器"',o:['跟上它的速度','由我来调它的快慢','它响着，我做我的']}
+      ]
+    },
+    { eyebrow:'Part 2 · 图像投射', title:'图像投射（第 11–20 题）', note:'每题先在脑中想象那幅画面，再选出最贴近你直觉的解读。',
+      qs:[
+        {n:11,s:'想象一张照片：海边礁石上站着一个人，沙滩上坐着另一个人。你觉得站在礁石上的那个人，此刻在想——',o:['「等会儿该往哪走呢」','「这里风景真好，先待着」','「我得喊一声让下面那个人也上来看看」']},
+        {n:12,s:'一间会议室，长桌旁坐了一圈人，有一把椅子是空的——空着的那把椅子，你直觉它在桌子的哪个位置？',o:['主位（短边尽头）','长边中间','靠门口']},
+        {n:13,s:'想象两个人一起拼一幅没有图样的拼图。画面里你更清楚地看见自己在做什么？',o:['把拼好的递给对方，问「这样对吗」','在心里先想象出整幅图，再往那个方向拼','两人各拼一角，中间再凑起来']},
+        {n:14,s:'一条狗和它的主人在公园。你脑中先「看清」的是——',o:['狗在前面跑，绳子被拉得很直','人停下来，狗也跟着停下','两个并排走，绳子松松垮垮']},
+        {n:15,s:'想象暴雨突然来临，一群人挤在屋檐下。其中有一个人开口说话了，你觉得他说的是——',o:['「大家往里站，挤一挤就不淋了」','「唉，这雨什么时候停啊」','「你们先走，我等雨小点」']},
+        {n:16,s:'一幅画：登山途中，队伍停在岔路口。走在最前面的那个人，你想象他是——',o:['回头等大家拿主意','已经抬手指向其中一条路','蹲下来系鞋带，让别人先看路']},
+        {n:17,s:'想象一场没有指挥的合奏。音乐居然还挺好听。你觉得靠的是——',o:['有个人用眼神和呼吸在悄悄带节奏','每个人都在认真听别人、配合别人','大家恰好都很默契，谁也没多想']},
+        {n:18,s:'一张桌子上摆着一盘还没切的蛋糕和一把刀。画面里下一秒最自然发生的是——',o:['有人拿起刀，问「要切几块」','大家围着，等着有人来切','有人说「我来分吧」，然后动手切了']},
+        {n:19,s:'想象你在看一部默片：两个人在争论一件事，但你听不见声音。你从动作上先判断出谁占上风——通过——',o:['谁的手势更大、身体更前倾','谁在点头、谁在往后靠','看不太出来，两个人都很克制']},
+        {n:20,s:'一片空旷的草地，有人放风筝。画面定格的瞬间，你的视线先落在——',o:['拉线的那只手','飞在天上的风筝','风本身']}
+      ]
+    },
+    { eyebrow:'Part 3 · 情境续写', title:'情境续写（第 21–30 题）', note:'读完每个情境后，脑中最先自动浮现的「下一幕」是哪一个？',
+      qs:[
+        {n:21,s:'朋友几个临时决定出去玩，但谁都没说去哪。沉默了几秒之后，你脑中浮现的画面是——',o:['我说「要不去 XX 吧」，然后大家就动了','总有人会先提的，我等着附议','我说「你们想去哪我都行」']},
+        {n:22,s:'项目搭档跟你的想法不一致，而且都有道理。接下来——',o:['我会把我的理由讲透，争取说服他','那就先按他的来，出问题再说','我们各退一步，找个折中']},
+        {n:23,s:'你走进一个全是陌生人的房间，要待一整晚。你想象自己——',o:['找一两个看起来友善的人，主动搭话','先找个角落，等别人来跟我聊','观察一圈，看谁是这里的「中心」']},
+        {n:24,s:'你和朋友点外卖，他说「随便，你定」。这句话让你——',o:['挺顺手的，我很快就定好了','有点为难，我更想他给个范围','那我反问他「那你不想吃什么」']},
+        {n:25,s:'团队里出了一个谁都没料到的乱子。最先动起来的画面里——',o:['我开始分配「你管这个、我管那个」','我等负责人发话，然后照做','我先把现场情况摸清楚，再说']},
+        {n:26,s:'恋爱/亲密关系里，关于「周末怎么过」反复出现分歧。你更常处在的位置是——',o:['我提方案，对方大多会同意','对方提，我大多会跟','轮流来，这次你定下次我定']},
+        {n:27,s:'你在教别人做一件你很拿手的事。你脑中那一幕是——',o:['「看着我做一遍，然后照着来」','「你先试，卡住了我再说」','「你想怎么试都行，我在旁边」']},
+        {n:28,s:'一群人围着一张地图讨论路线，吵了很久没结果。这时你——',o:['一锤定音：「就这条，走。」','心里有倾向，但等多数人定','提议「要不投票」']},
+        {n:29,s:'别人对你提了一个你不太认同的要求。你的第一反应——',o:['直接说「这个我做不到」','先答应，事后再想办法','「让我想想」，然后慢慢绕开']},
+        {n:30,s:'你被推举临时主持一场没准备的聚会游戏。那一刻你的身体感觉是——',o:['一种被点亮的兴奋，马上开始张罗','一阵不自在，希望有人接手','无所谓，跟着流程走就行']}
+      ]
+    },
+    { eyebrow:'Part 4 · 隐喻与偏好', title:'隐喻与偏好（第 31–40 题）', note:'不必想原因，单纯哪个画面更吸引你 / 更像你？',
+      qs:[
+        {n:31,s:'如果一段重要关系是一支舞——',o:['我更享受引导舞步','我更享受被稳稳带领','我更喜欢两人即兴轮换']},
+        {n:32,s:'如果你是一栋房子里的一样东西，更愿意是——',o:['门（决定谁进谁出）','窗（让光和风进来）','承重墙（撑住整栋，但不被看见）']},
+        {n:33,s:'下面哪种水你更被吸引——',o:['推动水车的激流','滋养田地的溪水','蓄势待发的深潭']},
+        {n:34,s:'在一个故事里，你更想成为——',o:['下达任务的国王/女王','完成任务的骑士','在幕后出谋划策的军师']},
+        {n:35,s:'关于「安全感」，更贴近你的画面是——',o:['一切都在我的掌控之中','有人替我把一切安排妥当','谁都不需要管谁']},
+        {n:36,s:'如果给你一支笔，在共同的故事里你更想——',o:['写开头，定下基调','接着别人的句子往下写','写结尾，收住全局']},
+        {n:37,s:'你更喜欢哪种登山方式——',o:['当那个在前面探路、喊「跟上」的人','当那个跟着可靠领队、专心走路的人','一个人按自己节奏慢慢爬']},
+        {n:38,s:'哪句话听起来更让你舒服——',o:['「这件事你说了算。」','「这件事我替你安排好了。」','「这件事我们一起拿主意。」']},
+        {n:39,s:'如果情绪是天气，你更认同的画面——',o:['我能让屋里的气氛变晴或变阴','我的心情很容易被身边人带着走','我尽量让自己内部自成一片小气候']},
+        {n:40,s:'终极隐喻：你更愿意是棋盘上的——',o:['那只移动别人的手','被精准布局的那枚关键棋子','站在一旁、看懂整盘棋的人']}
+      ]
+    }
+  ];
+  var SC=[[1,-1,0],[-1,1,1],[-1,1,0],[-1,1,0],[1,-1,1],[0,-1,1],[-1,1,0],[1,-1,0],[-1,1,0],[-1,1,1],[0,-1,1],[1,0,-1],[-1,1,0],[1,-1,0],[1,-1,-1],[-1,1,-1],[1,-1,0],[1,-1,1],[1,-1,0],[1,-1,0],[1,-1,0],[1,-1,0],[1,-1,0],[1,-1,0],[1,-1,0],[1,-1,0],[1,-1,-1],[1,-1,0],[1,-1,0],[1,-1,0],[1,-1,0],[1,-1,0],[1,-1,1],[1,-1,1],[1,-1,0],[1,-1,1],[1,-1,0],[-1,1,0],[1,-1,0],[1,-1,0]];
+  var LBL=['A','B','C'], TOTAL=40;
+
+  function renderQuiz(root) {
+    var h='';
+    h+='<div class="sm-intro"><p class="sm-intro-title">作答须知</p><ul>';
+    h+='<li>凭直觉作答，不要分析——投射测验的有效性来自「第一反应」。</li>';
+    h+='<li>没有正确答案，也没有好坏之分。</li>';
+    h+='<li>全程约 12–18 分钟，请独立完成。</li>';
+    h+='<li>越想表现某种形象，结果越不准。</li>';
+    h+='</ul></div>';
+    h+='<div class="sm-progress" id="sm-progress"><div class="sm-progress-text">已作答 <span id="sm-cnt">0</span> / '+TOTAL+' 题</div><div class="sm-progress-track"><div class="sm-progress-fill" id="sm-fill" style="width:0%"></div></div></div>';
+    h+='<form id="sm-form" novalidate>';
+    PARTS.forEach(function(part){
+      h+='<div class="sm-section"><p class="sm-section-eyebrow">'+part.eyebrow+'</p><h2 class="sm-section-title">'+part.title+'</h2><p class="sm-section-note">'+part.note+'</p></div>';
+      part.qs.forEach(function(q){
+        h+='<div class="sm-q" id="sm-q'+q.n+'"><div class="sm-q-head"><span class="sm-q-num">'+q.n+'.</span><p class="sm-q-stem">'+q.s+'</p></div><div class="sm-opts">';
+        q.o.forEach(function(opt,j){h+='<label class="sm-opt" data-name="q'+q.n+'"><input type="radio" name="q'+q.n+'" value="'+j+'"><span class="sm-opt-badge">'+LBL[j]+'</span><span class="sm-opt-text">'+opt+'</span></label>';});
+        h+='</div></div>';
+      });
+    });
+    h+='<div class="sm-error" id="sm-error"></div><button type="submit" class="sm-submit">查看我的结果</button></form>';
+    root.innerHTML=h; bindEvents(root);
+  }
+
+  function bindEvents(root){
+    root.addEventListener('change',function(e){
+      if(!e.target||e.target.type!=='radio')return;
+      var name=e.target.name,val=e.target.value;
+      root.querySelectorAll('label[data-name="'+name+'"]').forEach(function(l){l.classList.remove('is-selected');});
+      var inp=root.querySelector('input[name="'+name+'"][value="'+val+'"]');
+      if(inp){var lbl=inp.closest('label');if(lbl)lbl.classList.add('is-selected');}
+      var card=document.getElementById('sm-q'+name.slice(1));
+      if(card)card.classList.remove('unanswered-highlight');
+      updateProgress(root);
+    });
+    document.getElementById('sm-form').addEventListener('submit',function(e){
+      e.preventDefault();
+      var fd=new FormData(this),ans={};
+      fd.forEach(function(v,k){ans[k]=v;});
+      var n=Object.keys(ans).length;
+      if(n<TOTAL){
+        var err=document.getElementById('sm-error');err.style.display='block';err.textContent='还有 '+(TOTAL-n)+' 题未作答，请完成后再提交。';
+        var allNames=[];PARTS.forEach(function(p){p.qs.forEach(function(q){allNames.push('q'+q.n);});});
+        var first=null;allNames.forEach(function(nm){var card=document.getElementById('sm-'+nm);if(card&&!ans[nm]){card.classList.add('unanswered-highlight');if(!first)first=card;}});
+        if(first)first.scrollIntoView({behavior:'smooth',block:'center'});return;
+      }
+      var result=calcScores(ans);showResults(root,result);root.scrollIntoView({behavior:'smooth',block:'start'});
+    });
+  }
+
+  function updateProgress(root){
+    var n=(root||document).querySelectorAll('#sm-form input[type="radio"]:checked').length;
+    var cnt=document.getElementById('sm-cnt'),fill=document.getElementById('sm-fill');
+    if(cnt)cnt.textContent=n;if(fill)fill.style.width=Math.round(n/TOTAL*100)+'%';
+  }
+
+  function calcScores(ans){
+    var allQs=[];PARTS.forEach(function(p){p.qs.forEach(function(q){allQs.push(q);});});
+    var scores={},total=0,zeroCount=0;
+    allQs.forEach(function(q,i){var idx=parseInt(ans['q'+q.n]!==undefined?ans['q'+q.n]:'0',10),sc=SC[i][idx];scores[q.n]=sc;total+=sc;if(sc===0)zeroCount++;});
+    var p1=PARTS[0].qs.reduce(function(s,q){return s+scores[q.n];},0),p2=PARTS[1].qs.reduce(function(s,q){return s+scores[q.n];},0),p3=PARTS[2].qs.reduce(function(s,q){return s+scores[q.n];},0),p4=PARTS[3].qs.reduce(function(s,q){return s+scores[q.n];},0);
+    var ab=p1+p4,co=p2+p3,consistent=(ab>=0&&co>=0)||(ab<=0&&co<=0),gap=ab-co;
+    return{total:total,zeroCount:zeroCount,abstract:ab,concrete:co,consistent:consistent,gap:gap};
+  }
+
+  function getLevel(score){
+    if(score>=15)return{tag:'强 S',label:'明显支配倾向',desc:'你的心理能量天然指向主导、定义和推动。在模糊情境中，你会本能地去「握住方向盘」——做决定、定规则、为局面负责。',pros:'决断力强、在混乱中能稳住局面、容易成为天然的组织者和领导者。',risks:'难以放权，容易把「我来」变成「只能听我的」；当无法掌控时焦虑感较强。'};
+    if(score>=6)return{tag:'中度 S',label:'偏支配',desc:'你在多数场合愿意承担引导角色，但不至于事事抢占主导。你能领导，也保留了协商的弹性，通常是适应性较好的一种配置。',pros:null,risks:null};
+    if(score>=-5)return{tag:'情境型',label:'均衡 / 灵活',desc:'你不固定在某一极，能带也能跟，常根据场合、对象和自身状态切换。',pros:null,risks:null};
+    if(score>=-14)return{tag:'中度 M',label:'偏顺从',desc:'你在关系中更自在于配合、支持与跟随，倾向于先照顾他人意愿，愿意把方向交给可信任的人。',pros:'高度共情、善于支持他人、是团队中珍贵的稳定与黏合力量。',risks:'别让「配合」长期滑成「压抑自己的需求」。'};
+    return{tag:'强 M',label:'明显顺从倾向',desc:'你强烈倾向于退让、适应和被引导。在模糊情境中你会本能地等待他人定调，把自主权交出去能让你感到轻松和安全。',pros:'高度的共情与配合能力、善于支持他人、是团队中珍贵的稳定力量。',risks:'边界感容易模糊，自身需求和意见长期得不到表达；在不健康的关系里更易被忽视。'};
+  }
+
+  function buildAxis(score){
+    var pct=Math.max(2,Math.min(98,Math.round(((40-score)/80)*100))),sign=score>0?'+':'';
+    var mc='color:color-mix(in srgb,var(--color-foreground) 55%,var(--color-background) 45%)';
+    var h='<div style="margin:0 0 0.5rem;"><div style="display:flex;justify-content:space-between;font-size:0.72rem;'+mc+';margin-bottom:0.5rem;"><span>支配 S&ensp;+40</span><span>均衡&ensp;0</span><span>顺从 M&ensp;−40</span></div>';
+    h+='<div style="position:relative;height:6px;background:color-mix(in srgb,var(--color-muted) 28%,var(--color-background) 72%);border-radius:3px;">';
+    h+='<div style="position:absolute;width:1px;height:12px;background:var(--color-muted);opacity:0.4;top:-3px;left:50%;transform:translateX(-50%);"></div>';
+    h+='<div style="position:absolute;width:18px;height:18px;background:var(--color-foreground);border-radius:50%;top:-6px;left:'+pct+'%;transform:translateX(-50%);"></div>';
+    h+='</div><div style="text-align:center;margin-top:0.8rem;"><span style="font-size:2.8rem;font-weight:300;letter-spacing:-0.02em;line-height:1;">'+sign+score+'</span></div></div>';
+    return h;
+  }
+
+  function buildAdvice(lv,score,zeroCount,consistent,gap){
+    var mc='color:color-mix(in srgb,var(--color-foreground) 55%,var(--color-background) 45%)';
+    var h='<div class="sm-card"><p class="sm-card-title">给你的建议</p>';
+    if(score>=6){
+      h+='<p style="font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;'+mc+';margin:0 0 0.6rem;">适合偏支配倾向的练习</p>';
+      h+='<ul style="margin:0;padding-left:1.1rem;font-size:0.85rem;line-height:1.82;">';
+      ['<strong>刻意练习「让出方向盘」。</strong>在低风险的小事上主动说「你来定」，并真正接受对方的决定，训练对「不掌控」的耐受。','<strong>把决断力转成赋能。</strong>与其替别人决定，不如先问「你怎么想」，再帮对方把想法落地。','<strong>关注亲密关系里的声量。</strong>定期问伴侣/朋友：「有没有什么是你想说但被我打断了的？」','<strong>识别掌控焦虑。</strong>当事情失控就坐立不安时，练习区分「我真的需要掌控」和「我只是不习惯不确定」。'].forEach(function(t){h+='<li style="margin-bottom:0.6rem;">'+t+'</li>';});
+      h+='</ul>';
+    }else if(score<=-6){
+      h+='<p style="font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;'+mc+';margin:0 0 0.6rem;">适合偏顺从倾向的练习</p>';
+      h+='<ul style="margin:0;padding-left:1.1rem;font-size:0.85rem;line-height:1.82;">';
+      ['<strong>从「表达偏好」开始，而不是「争夺主导」。</strong>先从能说出「我其实更想去 A」这种小事练起。','<strong>建立最小边界清单。</strong>列出 3 件「我可以让步」和 3 件「我不愿让步」的事，在关系中守住后者。','<strong>练习做决定的肌肉。</strong>主动承担一件小事的「拍板权」，体会「我定的也挺好」的经验。','<strong>警惕讨好型模式。</strong>如果「配合」常伴随委屈或不被看见的感觉，这可能已超出风格，值得和信任的人或咨询师聊聊。'].forEach(function(t){h+='<li style="margin-bottom:0.6rem;">'+t+'</li>';});
+      h+='</ul>';
+    }else{
+      h+='<p style="font-size:0.85rem;line-height:1.82;margin:0;">'+(zeroCount>=10?'你的均衡分数中有较多「都行 / 旁观」的选择（共 '+zeroCount+' 个零分项）。长期的「都行」看似省心，但会让别人无从了解真实的你。试着在一些事上<strong>明确表态</strong>——即使只是个小偏好。':'你的均衡是真实的灵活性——能在该主导时出头、该配合时退让。可以更有意识地去<strong>「点名」自己当下扮演的角色</strong>，让切换变成主动选择。')+'</p>';
+    }
+    if(!consistent){
+      var gapNote=gap>8?'你在隐喻/联想题里明显偏向支配，但在具体情境题里更倾向配合——内心渴望更多主导权，现实中却被习惯或环境压住了。这个落差本身，往往比单一得分更值得探索。':'你在具体情境里表现出更多掌控，但联想/隐喻中更偏向顺从——也许你在实际行动中已经发展出了主动性，但内心的「理想自我」仍然更向往跟随的安全感。';
+      h+='<div style="height:1px;background:var(--color-border);margin:1rem 0;"></div><div style="font-size:0.85rem;line-height:1.82;padding:0.9rem 1rem;background:color-mix(in srgb,var(--color-muted) 10%,var(--color-background) 90%);border-radius:4px;"><strong>理想自我 ≠ 现实行为</strong><br>'+gapNote+'</div>';
+    }
+    h+='</div>'; return h;
+  }
+
+  function buildScience(){
+    var mc='color:color-mix(in srgb,var(--color-foreground) 55%,var(--color-background) 45%)';
+    var dim='font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;'+mc+';margin:0 0 0.6rem;';
+    var body='font-size:0.85rem;line-height:1.85;',li='margin-bottom:0.55rem;';
+    var dv='<div style="height:1px;background:var(--color-border);margin:1.2rem 0;"></div>';
+    var h='<div class="sm-card"><p class="sm-card-title">关于支配—顺从维度的科学背景</p>';
+    h+='<p style="'+dim+'">理论来源</p><p style="'+body+'margin:0 0 0.75rem;">本测验关注的「支配—顺从」维度是人格与社会心理学中有长期研究传统的构念，并非情趣概念的挪用。<strong>人际环状模型</strong>（Leary, 1957；Wiggins; Kiesler）将人际行为描述在两条正交轴上：纵轴为支配—顺从，横轴为亲和—敌意。本测验聚焦的正是纵轴。<strong>能动与共生</strong>（Bakan, 1966）区分了两种基本人性取向：能动（追求掌控、独立、影响）与共生（追求联结、配合、融入）；S 倾向偏能动，M 倾向偏共生。</p>';
+    h+=dv+'<p style="'+dim+'">研究发现</p><ul style="margin:0;padding-left:1.1rem;'+body+'">';
+    ['支配倾向通常与<em>较高的外向性</em>（尤其是「支配性/自信」侧面）以及<em>较低的宜人性</em>相关；顺从倾向则常与<em>较高的宜人性</em>（顺从、谦逊、合作）相关。','McClelland 的权力动机（need for power）与支配端高度对应；亲和动机（need for affiliation）对应顺从端。','一个人对「交出/握住控制权」的舒适度，也受早期依恋经验影响，但成年后的取向是可塑的，并非命定。','投射测验（如 TAT、罗夏墨迹）试图绕过社会赞许效应和自我认知偏差。本测验借用了词语联想、图像主题投射、情境续写和隐喻偏好四种技术，降低被有意识操纵的空间。'].forEach(function(f){h+='<li style="'+li+'">'+f+'</li>';});
+    h+='</ul>'+dv+'<p style="'+dim+'">重要说明</p><ul style="margin:0;padding-left:1.1rem;'+body+'">';
+    ['<strong>这不是临床诊断工具</strong>，结果仅供自我探索参考。','<strong>支配与顺从是连续谱，不是二元标签</strong>。同一个人在工作、友情、亲密关系中的取向可能完全不同。','<strong>两端都没有道德或健康上的高下</strong>。健康的标志是「能够在需要时切换」，而非固守一极。','<strong>投射测验本身在学界存在争议</strong>——请把结果当作「一面镜子」，而非「一份判决书」。'].forEach(function(c){h+='<li style="'+li+'">'+c+'</li>';});
+    h+='</ul></div>'; return h;
+  }
+
+  function showResults(root,res){
+    var lv=getLevel(res.total),h='';
+    h+='<h1 style="font-size:1.35rem;font-weight:500;letter-spacing:0.04em;margin:0 0 1.25rem;">测验结果</h1>';
+    h+='<div class="sm-card" style="text-align:center;">'+buildAxis(res.total);
+    h+='<div class="sm-level-pill">'+lv.label+'（'+lv.tag+'）</div>';
+    h+='<p style="font-size:0.85rem;color:color-mix(in srgb,var(--color-foreground) 55%,var(--color-background) 45%);line-height:1.78;margin:0;">'+lv.desc+'</p>';
+    if(lv.pros){h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-top:1rem;text-align:left;"><div style="padding:0.75rem;background:color-mix(in srgb,var(--color-muted) 8%,var(--color-background) 92%);border-radius:4px;font-size:0.82rem;line-height:1.7;"><div style="font-size:0.7rem;letter-spacing:0.08em;text-transform:uppercase;color:color-mix(in srgb,var(--color-foreground) 55%,var(--color-background) 45%);margin-bottom:0.3rem;">优势</div>'+lv.pros+'</div><div style="padding:0.75rem;background:color-mix(in srgb,var(--color-muted) 8%,var(--color-background) 92%);border-radius:4px;font-size:0.82rem;line-height:1.7;"><div style="font-size:0.7rem;letter-spacing:0.08em;text-transform:uppercase;color:color-mix(in srgb,var(--color-foreground) 55%,var(--color-background) 45%);margin-bottom:0.3rem;">风险</div>'+lv.risks+'</div></div>';}
+    h+='</div>';
+    h+='<div class="sm-card"><p class="sm-card-title">补充指标</p><div class="sm-metric-grid">';
+    var zl=res.zeroCount<=6?res.zeroCount+' 个（较少）':res.zeroCount<=9?res.zeroCount+' 个（中等）':res.zeroCount+' 个（较多）';
+    var zn=res.zeroCount<=6?'偏向主动选择角色，灵活性强。':res.zeroCount<=9?'混合了真实灵活与部分回避。':'偏向回避——可能习惯用「都行」躲开冲突和责任。';
+    h+='<div class="sm-metric-cell"><div class="sm-metric-label">旁观 / 回避计数（0 分项）</div><div class="sm-metric-value">'+zl+'</div><div class="sm-metric-note">'+zn+'</div></div>';
+    var as=res.abstract>=0?'+':'',cs=res.concrete>=0?'+':'';
+    var cl=res.consistent?'方向一致':'存在落差';
+    var cn=res.consistent?'联想/隐喻题（'+as+res.abstract+'）与情境题（'+cs+res.concrete+'）方向吻合，倾向稳定。':'联想/隐喻题（'+as+res.abstract+'）与情境题（'+cs+res.concrete+'）方向不同，理想自我与现实行为有落差。';
+    h+='<div class="sm-metric-cell"><div class="sm-metric-label">抽象 vs. 情境一致性</div><div class="sm-metric-value">'+cl+'</div><div class="sm-metric-note">'+cn+'</div></div>';
+    h+='</div></div>';
+    h+=buildAdvice(lv,res.total,res.zeroCount,res.consistent,res.gap);
+    h+=buildScience();
+    h+='<p class="sm-disclaimer">本测验为自我探索用途，非专业心理测量或诊断工具。</p>';
+    h+='<button class="sm-reset" id="sm-reset">重新测验</button>';
+    root.innerHTML=h;
+    document.getElementById('sm-reset').addEventListener('click',function(){renderQuiz(root);root.scrollIntoView({behavior:'smooth',block:'start'});});
+  }
+
+  function init(){var root=document.getElementById('sm-root');if(root)renderQuiz(root);}
+  document.addEventListener('astro:page-load',init);
+})();
+</script>
