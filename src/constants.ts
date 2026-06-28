@@ -36,6 +36,7 @@ export const TOOL_LINKS = [
   { name: "🍺 SillyTavern", url: "https://jg.keita.cc" },
   { name: "🚩 Server Status", url: "https://tz.keita.cc/" },
   { name: "🎮 ASF", url: "https://asf.keita.cc/" },
+  { name: "☕️ The Last Stand", url: "https://ff14.cafe" },
 ] as const;
 
 export const SOCIALS: Social[] = [
@@ -64,11 +65,6 @@ export const SOCIALS: Social[] = [
         action: "copy",
         copyText: "SW-3339-4585-7885",
         copiedLabel: "已复制",
-      },
-      {
-        name: "PSN",
-        url: "https://profile.playstation.com/zhuilala",
-        emoji: "💙",
       },
     ],
   },
