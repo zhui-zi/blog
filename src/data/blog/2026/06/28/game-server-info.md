@@ -16,7 +16,7 @@ description: "记录游戏联机相关的服务配置信息，包括 EasyN2N 客
 
 | 字段 | 填写 |
 | --- | --- |
-| Supernode 地址 | `n2n.keita.cc:7654` (解析生效后) 或暂用 `60.205.182.77:7654` |
+| Supernode 地址 | `n2n.keita.cc:7654` |
 | 版本 | `v3` |
 | 网络名 / Community | `keita` 或 `keita0`~`keita9` (同组相同) |
 | 密码 / Key | 自定义 (同组相同) |
