@@ -3,7 +3,7 @@ async function loadGoogleFont(
   text: string,
   weight: number
 ): Promise<ArrayBuffer> {
-  const API = `https://fonts.loli.net/css2?family=${font}:wght@${weight}&text=${encodeURIComponent(text)}`;
+  const API = `https://fonts.googleapis.com/css2?family=${font}:wght@${weight}&text=${encodeURIComponent(text)}`;
 
   const css = await (
     await fetch(API, {
