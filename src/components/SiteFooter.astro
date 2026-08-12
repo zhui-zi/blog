@@ -4,6 +4,7 @@ import { themeConfig } from '~/.config'
 const year = new Date().getFullYear()
 
 const { website, author, footer } = themeConfig.site
+const licenseUrl = 'https://creativecommons.org/licenses/by-nc-sa/4.0/'
 
 function parseFooter(str: string) {
   str = str.replace(/%author/g, author)
@@ -15,8 +16,47 @@ function parseFooter(str: string) {
 
 {footer.length && footer.map((str) => <p set:html={parseFooter(str)} />)}
 
+<a
+  class="license-badge not-underline-hover"
+  href={licenseUrl}
+  target="_blank"
+  rel="license noopener noreferrer"
+  aria-label="Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International"
+>
+  <img
+    src="https://licensebuttons.net/l/by-nc-sa/4.0/88x31.png"
+    width="88"
+    height="31"
+    loading="lazy"
+    decoding="async"
+    alt="CC BY-NC-SA 4.0"
+  />
+</a>
+
 <style>
   p {
     --at-apply: 'font-bold text-3';
+  }
+
+  .license-badge {
+    display: inline-block;
+    margin-top: 0.7rem;
+    line-height: 0;
+    opacity: 0.72;
+    transition: opacity 160ms ease;
+  }
+
+  .license-badge:hover,
+  .license-badge:focus-visible {
+    opacity: 1;
+  }
+
+  .license-badge:focus-visible {
+    outline: 1px solid var(--color-foreground);
+    outline-offset: 0.2rem;
+  }
+
+  .license-badge img {
+    display: block;
   }
 </style>

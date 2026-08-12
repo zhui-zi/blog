@@ -38,15 +38,19 @@ export const userConfig: Partial<UserConfig> = {
     ],
   },
   appearance: {
-    theme: 'system',
+    theme: 'light',
     locale: 'zh-cn',
     colorsLight: {
-      primary: '#2e405b',
-      background: '#ffffff',
+      primary: '#332f2a',
+      background: '#e6e0d3',
     },
     colorsDark: {
-      primary: '#f3f0e8',
-      background: '#232222',
+      primary: '#e6e0d3',
+      background: '#332f2a',
+    },
+    fonts: {
+      header: '"Noto Serif SC","Source Han Serif SC","Source Han Serif CN","Songti SC","STSong",serif',
+      ui: '"Noto Serif SC","Source Han Serif SC","Source Han Serif CN","Songti SC","STSong",serif',
     },
   },
   seo: {
