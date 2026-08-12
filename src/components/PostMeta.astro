@@ -5,9 +5,10 @@ import PostCategory from './PostCategory.astro'
 
 interface Props {
   post: Post
+  preload?: boolean
 }
 
-const { post } = Astro.props
+const { post, preload = false } = Astro.props
 const { translate: t } = Astro.locals
 
 const categoryList = post.data.categories ?? []
@@ -15,7 +16,7 @@ const categoryList = post.data.categories ?? []
 
 <header flex="~ col gap-2">
   <h1 class="post-title">
-    <a class="not-prose" href={getPostPath(post)}>{post.data.title}</a>
+    <a class="not-prose" href={getPostPath(post)} data-swup-preload={preload || undefined}>{post.data.title}</a>
   </h1>
   <div class="text-3.5">
     <span>{t(post.data.modDate ? 'updated_at' : 'posted_at')}</span>

@@ -1,0 +1,131 @@
+<script>
+  import '@github/clipboard-copy-element'
+
+  function setupCodeCopy() {
+    document.querySelectorAll<HTMLElement>('.post-content pre').forEach((codeBlock) => {
+      if (codeBlock.parentElement?.classList.contains('code-container')) {
+        return
+      }
+
+      const code = codeBlock.querySelector('code')
+      if (!code) {
+        return
+      }
+
+      const wrapper = document.createElement('div')
+      const copyButton = document.createElement('clipboard-copy')
+      wrapper.className = 'code-container'
+      copyButton.value = code.textContent ?? ''
+      copyButton.className = 'clipboard-copy'
+      copyButton.title = '复制代码'
+      copyButton.setAttribute('aria-label', '复制代码')
+      copyButton.setAttribute('aria-live', 'polite')
+      copyButton.innerHTML = `
+        <span class="i-mdi-content-copy copy-icon" aria-hidden="true"></span>
+        <span class="copy-label">复制</span>
+      `
+
+      codeBlock.append(copyButton)
+      codeBlock.parentNode?.insertBefore(wrapper, codeBlock)
+      wrapper.append(codeBlock)
+    })
+  }
+
+  function handleCodeCopy(event: Event) {
+    const copyButton = event.target as HTMLElement
+    if (!copyButton.matches('clipboard-copy.clipboard-copy')) {
+      return
+    }
+
+    const icon = copyButton.querySelector<HTMLElement>('.copy-icon')
+    const label = copyButton.querySelector<HTMLElement>('.copy-label')
+    icon?.classList.replace('i-mdi-content-copy', 'i-mdi-check')
+    if (label) {
+      label.textContent = '已复制'
+    }
+    copyButton.title = '已复制'
+    copyButton.setAttribute('aria-label', '代码已复制')
+
+    window.setTimeout(() => {
+      icon?.classList.replace('i-mdi-check', 'i-mdi-content-copy')
+      if (label) {
+        label.textContent = '复制'
+      }
+      copyButton.title = '复制代码'
+      copyButton.setAttribute('aria-label', '复制代码')
+    }, 1500)
+  }
+
+  if (!document.documentElement.dataset.codeCopyListener) {
+    document.documentElement.dataset.codeCopyListener = 'true'
+    document.addEventListener('clipboard-copy', handleCodeCopy)
+  }
+
+  setupCodeCopy()
+  document.addEventListener('astro:page-load', setupCodeCopy)
+</script>
+
+<style is:global>
+  .code-container {
+    position: relative;
+  }
+
+  .clipboard-copy {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    min-height: 1.9rem;
+    padding: 0.28rem 0.55rem;
+    border: 1px solid rgb(255 255 255 / 18%);
+    border-radius: 0.35rem;
+    color: #f8f8f2;
+    background: rgb(40 42 54 / 88%);
+    box-shadow: 0 0.15rem 0.5rem rgb(0 0 0 / 18%);
+    font-family: var(--font-app);
+    font-size: 0.72rem;
+    font-weight: 700;
+    line-height: 1;
+    opacity: 0.76;
+    cursor: pointer;
+    backdrop-filter: blur(0.4rem);
+    transition:
+      opacity 160ms ease,
+      border-color 160ms ease,
+      transform 160ms ease;
+  }
+
+  .code-container:hover .clipboard-copy,
+  .clipboard-copy:hover,
+  .clipboard-copy:focus-visible {
+    border-color: rgb(255 255 255 / 38%);
+    opacity: 1;
+    transform: translateY(-1px);
+  }
+
+  .clipboard-copy:focus-visible {
+    outline: 2px solid #f8f8f2;
+    outline-offset: 2px;
+  }
+
+  .copy-icon {
+    width: 0.9rem;
+    height: 0.9rem;
+  }
+
+  @media (max-width: 640px) {
+    .clipboard-copy {
+      opacity: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .clipboard-copy {
+      transition: none;
+    }
+  }
+</style>

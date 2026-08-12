@@ -9,6 +9,7 @@ import Analytics from '~/components/Analytics.astro'
 import ThemeScript from '~/components/ThemeScript.astro'
 import BackToTop from '~/components/BackToTop.astro'
 import ReadingScrollbar from '~/components/ReadingScrollbar.astro'
+import CodeCopy from '~/components/CodeCopy.astro'
 import '~/styles/global.css'
 
 const lang = themeConfig.appearance.locale ?? 'en-us'
@@ -49,6 +50,7 @@ const isPostPage = Astro.url.pathname.startsWith('/posts/')
 
     <BackToTop />
     <ReadingScrollbar />
+    <CodeCopy />
 
     <footer class="transition-swup-footer py-7.5" lg="row-2-3 col-2-3">
       <SiteFooter />
@@ -106,8 +108,8 @@ const isPostPage = Astro.url.pathname.startsWith('/posts/')
         transform: translateY(1rem);
       }
       .transition-swup-main {
-        transition-duration: 0.5s;
-        transition-timing-function: linear;
+        transition-duration: 0.18s;
+        transition-timing-function: ease-out;
         transform: translateY(0);
         opacity: 1;
       }
