@@ -17,20 +17,15 @@ function parseFooter(str: string) {
 {footer.length && footer.map((str) => <p set:html={parseFooter(str)} />)}
 
 <a
-  class="license-badge not-underline-hover"
+  class="license-mark not-underline-hover"
   href={licenseUrl}
   target="_blank"
   rel="license noopener noreferrer"
   aria-label="Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International"
 >
-  <img
-    src="https://licensebuttons.net/l/by-nc-sa/4.0/88x31.png"
-    width="88"
-    height="31"
-    loading="lazy"
-    decoding="async"
-    alt="CC BY-NC-SA 4.0"
-  />
+  <span class="i-mdi-creative-commons license-icon" aria-hidden="true"></span>
+  <span class="license-terms">BY–NC–SA</span>
+  <span class="license-version">4.0</span>
 </a>
 
 <style>
@@ -38,25 +33,44 @@ function parseFooter(str: string) {
     --at-apply: 'font-bold text-3';
   }
 
-  .license-badge {
-    display: inline-block;
-    margin-top: 0.7rem;
-    line-height: 0;
-    opacity: 0.72;
-    transition: opacity 160ms ease;
+  .license-mark {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: 0.75rem;
+    padding-bottom: 0.2rem;
+    border-bottom: 1px solid color-mix(in srgb, currentColor 24%, transparent);
+    color: inherit;
+    font-family: var(--font-app);
+    font-size: 0.72rem;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 0.045em;
+    opacity: 0.64;
+    transition:
+      border-color 160ms ease,
+      opacity 160ms ease;
   }
 
-  .license-badge:hover,
-  .license-badge:focus-visible {
+  .license-mark:hover,
+  .license-mark:focus-visible {
+    border-color: currentColor;
     opacity: 1;
   }
 
-  .license-badge:focus-visible {
+  .license-mark:focus-visible {
     outline: 1px solid var(--color-foreground);
     outline-offset: 0.2rem;
   }
 
-  .license-badge img {
-    display: block;
+  .license-icon {
+    width: 1.05rem;
+    height: 1.05rem;
+  }
+
+  .license-version {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0;
+    opacity: 0.72;
   }
 </style>
