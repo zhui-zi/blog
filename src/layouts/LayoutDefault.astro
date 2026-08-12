@@ -12,6 +12,7 @@ import '~/styles/global.css'
 
 const lang = themeConfig.appearance.locale ?? 'en-us'
 const dark = themeConfig.appearance.theme === 'dark'
+const isPostPage = Astro.url.pathname.startsWith('/posts/')
 ---
 
 <html lang={lang} class:list={['animation-prepared', { dark }]}>
@@ -36,7 +37,13 @@ const dark = themeConfig.appearance.theme === 'dark'
       <SiteNavigation />
     </header>
 
-    <main class="transition-swup-main site-scrollbar overflow-y-scroll outline-none" lg="row-1-3 col-1-2 py-20 ">
+    <main
+      class:list={[
+        'transition-swup-main overflow-y-scroll outline-none',
+        isPostPage ? 'site-scrollbar' : 'site-scrollbar-hidden',
+      ]}
+      lg="row-1-3 col-1-2 py-20 "
+    >
       <slot />
     </main>
 

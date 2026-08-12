@@ -20,29 +20,42 @@ html {
 }
 
 .site-scrollbar {
-  scrollbar-color: color-mix(in srgb, var(--color-foreground) 38%, transparent) transparent;
+  scrollbar-color: color-mix(in srgb, var(--color-foreground) 46%, transparent)
+    color-mix(in srgb, var(--color-foreground) 7%, transparent);
   scrollbar-gutter: stable;
   scrollbar-width: thin;
 }
 
 .site-scrollbar::-webkit-scrollbar {
-  width: 0.65rem;
+  width: 0.6rem;
 }
 
 .site-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-foreground) 7%, transparent);
 }
 
 .site-scrollbar::-webkit-scrollbar-thumb {
-  border: 0.2rem solid transparent;
+  border: 0.18rem solid transparent;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--color-foreground) 38%, transparent);
+  background: color-mix(in srgb, var(--color-foreground) 46%, transparent);
   background-clip: padding-box;
 }
 
 .site-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: color-mix(in srgb, var(--color-foreground) 62%, transparent);
+  background: color-mix(in srgb, var(--color-foreground) 72%, transparent);
   background-clip: padding-box;
+}
+
+.site-scrollbar-hidden {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.site-scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 :where(a):not(.not-underline-hover) {

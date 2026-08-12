@@ -45,15 +45,6 @@ const fallbackProjects: Project[] = [
   },
 ]
 
-const projectLinks = [
-  { name: 'Cloud', icon: '\u2601\uFE0F', href: 'https://file.keita.cc/' },
-  { name: 'OBS Overlay', icon: '\uD83C\uDFA5', href: 'https://obsliveoverlay.keita.cc/' },
-  { name: 'SillyTavern', icon: '\uD83C\uDF7A', href: 'https://jg.keita.cc' },
-  { name: 'Server Status', icon: '\uD83D\uDEA9', href: 'https://tz.keita.cc/' },
-  { name: 'ASF', icon: '\uD83C\uDFAE', href: 'https://asf.keita.cc/' },
-  { name: 'The Last Stand', icon: '\u2615\uFE0F', href: 'https://ff14.cafe' },
-]
-
 function isRepository(value: unknown): value is GitHubRepository {
   if (!value || typeof value !== 'object') {
     return false
@@ -148,21 +139,6 @@ const dateFormatter = new Intl.DateTimeFormat('zh-CN', {
       ))
     }
   </ul>
-
-  <nav class="project-shortcuts" aria-label="Project links">
-    <span class="project-shortcuts-label">Project links</span>
-    <ul>
-      {
-        projectLinks.map((project) => (
-          <li>
-            <a href={project.href} target="_blank" rel="noopener noreferrer">
-              <span aria-hidden="true">{project.icon}</span> {project.name}
-            </a>
-          </li>
-        ))
-      }
-    </ul>
-  </nav>
 </section>
 
 <script>
@@ -442,37 +418,6 @@ const dateFormatter = new Intl.DateTimeFormat('zh-CN', {
     opacity: 0.55;
   }
 
-  .project-shortcuts {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    align-items: start;
-    gap: 0.6rem 1rem;
-    margin-top: 1rem;
-  }
-
-  .project-shortcuts-label {
-    padding-top: 0.18rem;
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    opacity: 0.55;
-    text-transform: uppercase;
-  }
-
-  .project-shortcuts ul {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.35rem 0.75rem;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .project-shortcuts a {
-    font-size: 0.8rem;
-    font-weight: 600;
-  }
-
   @media (max-width: 640px) {
     .home-projects {
       margin-bottom: 2.25rem;
@@ -480,10 +425,6 @@ const dateFormatter = new Intl.DateTimeFormat('zh-CN', {
     }
 
     .project-list {
-      grid-template-columns: 1fr;
-    }
-
-    .project-shortcuts {
       grid-template-columns: 1fr;
     }
   }

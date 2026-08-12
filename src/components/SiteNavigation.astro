@@ -3,6 +3,15 @@ import { themeConfig } from '~/.config'
 
 const { navLinks, socialLinks } = themeConfig.site
 const { translate: t } = Astro.locals
+
+const projectLinks = [
+  { name: 'Cloud', icon: '\u2601\uFE0F', href: 'https://file.keita.cc/' },
+  { name: 'OBS Overlay', icon: '\uD83C\uDFA5', href: 'https://obsliveoverlay.keita.cc/' },
+  { name: 'SillyTavern', icon: '\uD83C\uDF7A', href: 'https://jg.keita.cc' },
+  { name: 'Server Status', icon: '\uD83D\uDEA9', href: 'https://tz.keita.cc/' },
+  { name: 'ASF', icon: '\uD83C\uDFAE', href: 'https://asf.keita.cc/' },
+  { name: 'The Last Stand', icon: '\u2615\uFE0F', href: 'https://ff14.cafe' },
+]
 ---
 
 <nav class="text-center font-bold" flex="~ col gap-4">
@@ -17,22 +26,25 @@ const { translate: t } = Astro.locals
       ))
     }
   </ul>
-  <ul flex="~ row gap-1 justify-center">
+  <ul class="social-links" flex="~ row gap-1 justify-center">
     {
       socialLinks.map(({ href, name, label = name, copyText, copiedLabel }) => (
         <li>
           {copyText ? (
-            <button
-              type="button"
-              title={`${label}: ${copyText}`}
-              aria-label={`${label}: ${copyText}`}
-              data-social-copy={copyText}
-              data-copied-label={copiedLabel ?? 'Copied'}
-              class="social-link not-underline-hover inline-flex items-center"
-            >
-              <span aria-hidden="true" class:list={[`i-mdi-${name}`, 'w-6 h-6']} />
-              <span class="sr-only">{label}</span>
-            </button>
+            <span class="social-copy-control">
+              <button
+                type="button"
+                title={`${label}: ${copyText}`}
+                aria-label={`${label}: ${copyText}`}
+                data-social-copy={copyText}
+                data-copied-label={copiedLabel ?? 'Copied'}
+                class="social-link not-underline-hover inline-flex items-center"
+              >
+                <span aria-hidden="true" class:list={[`i-mdi-${name}`, 'w-6 h-6']} />
+                <span class="sr-only">{label}</span>
+              </button>
+              <span class="social-feedback" data-social-feedback role="status" aria-live="polite" />
+            </span>
           ) : (
             <a
               href={href}
@@ -50,6 +62,22 @@ const { translate: t } = Astro.locals
       ))
     }
   </ul>
+
+  <div class="project-links">
+    <span class="project-links-label">Project links</span>
+    <ul>
+      {
+        projectLinks.map((project) => (
+          <li>
+            <a href={project.href} target="_blank" rel="noopener noreferrer">
+              <span aria-hidden="true">{project.icon}</span>
+              <span>{project.name}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
 </nav>
 
 <script>
@@ -59,6 +87,8 @@ const { translate: t } = Astro.locals
         return
       }
       button.dataset.copyReady = 'true'
+      const feedback = button.parentElement?.querySelector<HTMLElement>('[data-social-feedback]')
+      let feedbackTimer: number | undefined
 
       button.addEventListener('click', async () => {
         const value = button.dataset.socialCopy
@@ -66,14 +96,36 @@ const { translate: t } = Astro.locals
           return
         }
 
-        await navigator.clipboard.writeText(value)
         const originalTitle = button.title
-        button.title = button.dataset.copiedLabel ?? 'Copied'
-        button.setAttribute('aria-label', button.title)
+        let message = button.dataset.copiedLabel ?? 'Copied'
 
-        window.setTimeout(() => {
+        const copied = await navigator.clipboard.writeText(value).then(
+          () => true,
+          () => false,
+        )
+        if (copied) {
+          button.classList.add('is-copied')
+        }
+        if (!copied) {
+          message = 'Copy failed'
+        }
+
+        button.title = message
+        button.setAttribute('aria-label', message)
+        if (feedback) {
+          feedback.textContent = message
+          feedback.classList.add('is-visible')
+        }
+
+        if (feedbackTimer) {
+          window.clearTimeout(feedbackTimer)
+        }
+
+        feedbackTimer = window.setTimeout(() => {
           button.title = originalTitle
           button.setAttribute('aria-label', originalTitle)
+          button.classList.remove('is-copied')
+          feedback?.classList.remove('is-visible')
         }, 1500)
       })
     })
@@ -91,5 +143,99 @@ const { translate: t } = Astro.locals
     color: inherit;
     background: transparent;
     cursor: pointer;
+  }
+
+  .social-links li,
+  .social-copy-control {
+    position: relative;
+  }
+
+  .social-copy-control {
+    display: inline-flex;
+  }
+
+  .social-link {
+    transition:
+      transform 160ms ease,
+      color 160ms ease;
+  }
+
+  .social-link.is-copied {
+    color: color-mix(in srgb, var(--color-foreground) 72%, #3aa675);
+    transform: scale(1.12);
+  }
+
+  .social-feedback {
+    position: absolute;
+    z-index: 10;
+    bottom: calc(100% + 0.5rem);
+    left: 50%;
+    padding: 0.3rem 0.5rem;
+    border: 1px solid color-mix(in srgb, var(--color-background) 30%, transparent);
+    border-radius: 0.35rem;
+    color: var(--color-background);
+    background: var(--color-foreground);
+    box-shadow: 0 0.35rem 1rem color-mix(in srgb, var(--color-foreground) 18%, transparent);
+    font-size: 0.7rem;
+    font-weight: 600;
+    line-height: 1;
+    opacity: 0;
+    pointer-events: none;
+    text-shadow: none;
+    transform: translate(-50%, 0.25rem);
+    transition:
+      opacity 160ms ease,
+      transform 160ms ease;
+    white-space: nowrap;
+  }
+
+  .social-feedback.is-visible {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+
+  .project-links {
+    width: 100%;
+    padding-top: 0.9rem;
+    border-top: 1px solid color-mix(in srgb, currentColor 16%, transparent);
+  }
+
+  .project-links-label {
+    display: block;
+    margin-bottom: 0.55rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    opacity: 0.55;
+    text-transform: uppercase;
+  }
+
+  .project-links ul {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.35rem 0.8rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .project-links a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+
+  @media (min-width: 1024px) {
+    .project-links-label {
+      text-align: left;
+    }
+
+    .project-links ul {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.4rem;
+    }
   }
 </style>
