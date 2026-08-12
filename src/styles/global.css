@@ -1,85 +1,27 @@
-@import url("https://fonts.loli.net/css2?family=Noto+Serif+SC:wght@300;400;500;700&display=swap");
-@import "tailwindcss";
-@import "./typography.css";
+:root {
+  --uno-colors-primary: theme('colors.primary');
+  --uno-colors-background: theme('colors.background');
+  --uno-fonts-ui: theme('fontFamily.ui');
+  --uno-colors-shadow: theme('colors.shadow');
+  --color-background: var(--uno-colors-background);
+  --color-foreground: var(--uno-colors-primary);
+  --color-border: color-mix(in srgb, var(--uno-colors-primary) 22%, transparent);
+  --color-muted: var(--uno-colors-primary);
+  --font-app: var(--uno-fonts-ui);
+}
+html {
+  --at-apply: antialiased;
+  --at-apply: 'bg-background c-primary font-ui text-shadow-color-shadow';
 
-@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
-
-:root,
-html[data-theme="light"] {
-  --background: #d0ccbd;
-  --foreground: #434343;
-  --accent: #434343;
-  --muted: #bab6a7;
-  --border: #a5a193;
-  --font-source-han-serif:
-    "思源宋体", "Source Han Serif SC", "Source Han Serif CN", "Noto Serif SC", "Songti SC", SimSun, serif;
+  text-shadow: 1px 1px 1px var(--uno-colors-shadow);
+  background-size: 7px 7px;
+  background-image: linear-gradient(to right, var(--uno-colors-shadow) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--uno-colors-shadow) 1px, transparent 1px);
 }
 
-html[data-theme="dark"] {
-  --background: #2a2a2a;
-  --foreground: #d0ccbd;
-  --accent: #d0ccbd;
-  --muted: #3a3a3a;
-  --border: #4a4a4a;
-  --font-source-han-serif:
-    "思源宋体", "Source Han Serif SC", "Source Han Serif CN", "Noto Serif SC", "Songti SC", SimSun, serif;
-}
-
-@theme inline {
-  --font-app: var(--font-source-han-serif);
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-accent: var(--accent);
-  --color-muted: var(--muted);
-  --color-border: var(--border);
-}
-
-@layer base {
-  * {
-    @apply border-border outline-accent/75;
-    scrollbar-width: auto;
-    scrollbar-color: var(--color-muted) transparent;
-  }
-  html {
-    @apply overflow-y-scroll scroll-smooth;
-    font-size: 17px;
-    line-height: 1.8;
-  }
-  p {
-    @apply mb-5;
-  }
-  @media (min-width: 640px) {
-    html {
-      font-size: 18px;
-    }
-  }
-  body {
-    @apply flex min-h-svh flex-col bg-background font-app text-foreground font-normal selection:bg-accent/75 selection:text-background;
-  }
-  a,
-  button {
-    @apply outline-offset-1 outline-accent focus-visible:no-underline focus-visible:outline-2 focus-visible:outline-dashed;
-  }
-  button:not(:disabled),
-  [role="button"]:not(:disabled) {
-    cursor: pointer;
-  }
-}
-
-@utility max-w-app {
-  @apply max-w-3xl;
-}
-
-@utility app-layout {
-  @apply mx-auto w-full max-w-app px-4;
-}
-
-.active-nav {
-  @apply underline decoration-wavy decoration-2 underline-offset-8;
-}
-
-/* Source: https://piccalil.li/blog/a-more-modern-css-reset/ */
-/* Anything that has been anchored to should have extra scroll margin */
-:target {
-  scroll-margin-block: 1rem;
+:where(a):not(.not-underline-hover) {
+  --at-apply: 'p-1.5px';
+  --at-apply: 'decoration-underline decoration-0.1em decoration-offset-2px';
+  --at-apply: 'ease-in-out duration-300ms';
+  --at-apply: 'hover:(c-background bg-primary decoration-primary)';
 }

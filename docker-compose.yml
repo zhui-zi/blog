@@ -4,6 +4,7 @@ services:
     ports:
       - 4321:4321
     working_dir: /app
-    command: npm run dev -- --host 0.0.0.0
+    command: sh -c "corepack enable && corepack pnpm install --frozen-lockfile && corepack pnpm dev --host 0.0.0.0"
     volumes:
       - ./:/app
+      - /app/node_modules
