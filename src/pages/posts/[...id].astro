@@ -33,10 +33,16 @@ const { translate: t } = Astro.locals
 <LayoutDefault>
   <SiteSeo slot="seo" title={entry.data.title} desc={entry.data.description} banner={entry.data.banner} />
 
-  <LayoutPost post={entry} showToc={!entry.data.quizPage}>
+  <LayoutPost post={entry}>
     {entry.data.quizPage === 'eq' && <QuizEQ />}
     {entry.data.quizPage === 'sm' && <QuizSM />}
-    {!entry.data.quizPage && <Content />}
+    {
+      !entry.data.quizPage && (
+        <div class="post-content">
+          <Content />
+        </div>
+      )
+    }
   </LayoutPost>
 
   <Pagination
