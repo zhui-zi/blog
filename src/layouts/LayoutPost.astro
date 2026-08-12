@@ -5,12 +5,19 @@ import type { Post } from '~/types'
 interface Props {
   post: Post
   preload?: boolean
+  detail?: boolean
 }
 
-const { post, preload = false } = Astro.props
+const { post, preload = false, detail = false } = Astro.props
 ---
 
-<article class="post-article prose">
+<article class:list={['post-article prose', { 'post-article-detail': detail }]}>
   <PostMeta post={post} preload={preload} />
   <slot />
 </article>
+
+<style is:global>
+  .post-article-detail > header {
+    margin-bottom: 2rem;
+  }
+</style>

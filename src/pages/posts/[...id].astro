@@ -33,7 +33,7 @@ const { translate: t } = Astro.locals
 <LayoutDefault>
   <SiteSeo slot="seo" title={entry.data.title} desc={entry.data.description} banner={entry.data.banner} />
 
-  <LayoutPost post={entry}>
+  <LayoutPost post={entry} detail>
     {entry.data.quizPage === 'eq' && <QuizEQ />}
     {entry.data.quizPage === 'sm' && <QuizSM />}
     {
