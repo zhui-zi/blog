@@ -7,7 +7,6 @@ categories:
   - "AI"
   - "llama.cpp"
   - "本地部署"
-description: "一份面向国内与通用环境的 llama.cpp 纯 CPU 部署指南，涵盖源码编译、模型下载、Docker、服务模式、量化与常见问题。"
 ---
 
 > 转载自 [点滴记忆](https://blog.quickso.cn/2026/08/07/llama-cpp%E7%BA%AFCPU%E9%83%A8%E7%BD%B2%E6%8C%87%E5%8D%97/)，原作者为 [木子欢儿](https://blog.quickso.cn/about/)，原文发布于 2026 年 8 月 7 日，采用 [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) 许可。

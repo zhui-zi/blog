@@ -65,14 +65,17 @@ function slugifyPathSegment(segment: string) {
 }
 
 const parser = new MarkdownIt()
+const postDescriptionLength = 200
+
 export function getPostDescription(post: Post) {
   if (post.data.description) {
-    return post.data.description
+    return post.data.description.slice(0, postDescriptionLength)
   }
 
   const html = parser.render(post.body || '')
   const sanitized = sanitizeHtml(html, { allowedTags: [] })
-  return sanitized.slice(0, 400)
+  const normalized = sanitized.replace(/\s+/g, ' ').trim()
+  return normalized.slice(0, postDescriptionLength)
 }
 
 export function formatDate(date: Date, format: string = 'YYYY-MM-DD') {
