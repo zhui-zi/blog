@@ -39,10 +39,9 @@ const isPostPage = Astro.url.pathname.startsWith('/posts/')
 
     <main
       class:list={[
-        'transition-swup-main overflow-y-scroll outline-none',
+        'site-main transition-swup-main overflow-y-scroll outline-none',
         isPostPage ? 'site-scrollbar' : 'site-scrollbar-hidden',
       ]}
-      lg="row-1-3 col-1-2 py-20 "
     >
       <slot />
     </main>
@@ -109,6 +108,14 @@ const isPostPage = Astro.url.pathname.startsWith('/posts/')
         transition-timing-function: linear;
         transform: translateY(0);
         opacity: 1;
+      }
+
+      @media (min-width: 1024px) {
+        .site-main {
+          grid-row: 1 / 3;
+          grid-column: 1 / 2;
+          padding-block: 5rem;
+        }
       }
     </style>
   </body>
