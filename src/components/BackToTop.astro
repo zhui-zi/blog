@@ -1,32 +1,47 @@
 <button class="back-to-top" type="button" data-back-to-top aria-label="返回顶部" title="返回顶部" hidden>
-  <span aria-hidden="true">&#8593;</span>
+  <span class="back-to-top-label" aria-hidden="true">Top</span>
+  <svg class="back-to-top-icon" viewBox="0 0 16 16" aria-hidden="true">
+    <path d="M8 13V3M4.5 6.5 8 3l3.5 3.5"></path>
+  </svg>
 </button>
 
 <script>
+  interface BackToTopButton extends HTMLButtonElement {
+    backToTopCleanup?: () => void
+  }
+
   function setupBackToTop() {
-    const scroller = document.querySelector<HTMLElement>('main.site-scrollbar')
-    const button = document.querySelector<HTMLButtonElement>('[data-back-to-top]')
-    if (!scroller || !button) {
+    const main = document.querySelector<HTMLElement>('main.site-scrollbar')
+    const button = document.querySelector<BackToTopButton>('[data-back-to-top]')
+
+    button?.backToTopCleanup?.()
+    if (!main || !button) {
+      if (button) {
+        button.hidden = true
+      }
       return
     }
 
+    const scroller = main.scrollHeight - main.clientHeight > 1 ? main : (document.scrollingElement as HTMLElement)
+    const scrollTarget: EventTarget = scroller === document.scrollingElement ? window : scroller
+    const controller = new AbortController()
+    const { signal } = controller
+
     const update = () => {
-      const isPost = Boolean(scroller.querySelector('.post-content'))
+      const isPost = Boolean(main.querySelector('.post-content'))
       button.hidden = !isPost || scroller.scrollTop < 480
     }
 
-    if (!scroller.dataset.backToTopReady) {
-      scroller.dataset.backToTopReady = 'true'
-      scroller.addEventListener('scroll', update, { passive: true })
-    }
+    scrollTarget.addEventListener('scroll', update, { passive: true, signal })
+    button.addEventListener(
+      'click',
+      () => {
+        scroller.scrollTo({ top: 0, behavior: 'smooth' })
+      },
+      { signal },
+    )
 
-    if (!button.dataset.ready) {
-      button.dataset.ready = 'true'
-      button.addEventListener('click', () => {
-        document.querySelector<HTMLElement>('main.site-scrollbar')?.scrollTo({ top: 0, behavior: 'smooth' })
-      })
-    }
-
+    button.backToTopCleanup = () => controller.abort()
     update()
   }
 
@@ -37,25 +52,25 @@
 <style>
   .back-to-top {
     position: fixed;
-    right: clamp(1rem, 3vw, 2.25rem);
-    bottom: clamp(1rem, 3vw, 2.25rem);
+    right: max(0.55rem, env(safe-area-inset-right));
+    bottom: max(0.85rem, env(safe-area-inset-bottom));
     z-index: 20;
-    display: grid;
-    width: 2.75rem;
-    height: 2.75rem;
-    place-items: center;
-    border: 1px solid var(--color-border);
-    border-radius: 999px;
-    color: var(--color-foreground);
-    background: color-mix(in srgb, var(--color-background) 90%, transparent);
-    box-shadow: 0 0.35rem 1.25rem color-mix(in srgb, var(--color-foreground) 16%, transparent);
+    display: flex;
+    min-width: 3.5rem;
+    height: 2rem;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.35rem;
+    padding: 0;
+    border: 0;
+    color: color-mix(in srgb, var(--color-foreground) 55%, transparent);
+    background: transparent;
     font: inherit;
-    font-size: 1.25rem;
     cursor: pointer;
-    backdrop-filter: blur(0.6rem);
+    text-shadow: none;
     transition:
-      border-color 180ms ease,
-      transform 180ms ease;
+      color 160ms ease,
+      transform 160ms ease;
   }
 
   .back-to-top[hidden] {
@@ -63,13 +78,45 @@
   }
 
   .back-to-top:hover {
-    border-color: color-mix(in srgb, var(--color-foreground) 58%, transparent);
-    transform: translateY(-2px);
+    color: var(--color-foreground);
+    transform: translateY(-1px);
   }
 
   .back-to-top:focus-visible {
-    outline: 2px solid var(--color-foreground);
-    outline-offset: 3px;
+    border-radius: 0.125rem;
+    outline: 1px solid var(--color-foreground);
+    outline-offset: 0.25rem;
+  }
+
+  .back-to-top-label {
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  .back-to-top-icon {
+    width: 1rem;
+    height: 1rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: square;
+    stroke-linejoin: miter;
+    stroke-width: 1.35;
+  }
+
+  @media (max-width: 1023px) {
+    .back-to-top {
+      right: max(0.15rem, env(safe-area-inset-right));
+      bottom: max(0.25rem, env(safe-area-inset-bottom));
+      min-width: 2.75rem;
+      height: 2.75rem;
+    }
+
+    .back-to-top-label {
+      display: none;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
