@@ -38,7 +38,7 @@ export const userConfig: Partial<UserConfig> = {
     ],
   },
   appearance: {
-    theme: 'light',
+    theme: 'system',
     locale: 'zh-cn',
     colorsLight: {
       primary: '#332f2a',

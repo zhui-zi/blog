@@ -22,7 +22,6 @@
       copyButton.setAttribute('aria-live', 'polite')
       copyButton.innerHTML = `
         <span class="i-mdi-content-copy copy-icon" aria-hidden="true"></span>
-        <span class="copy-label">复制</span>
       `
 
       codeBlock.append(copyButton)
@@ -38,19 +37,12 @@
     }
 
     const icon = copyButton.querySelector<HTMLElement>('.copy-icon')
-    const label = copyButton.querySelector<HTMLElement>('.copy-label')
     icon?.classList.replace('i-mdi-content-copy', 'i-mdi-check')
-    if (label) {
-      label.textContent = '已复制'
-    }
     copyButton.title = '已复制'
     copyButton.setAttribute('aria-label', '代码已复制')
 
     window.setTimeout(() => {
       icon?.classList.replace('i-mdi-check', 'i-mdi-content-copy')
-      if (label) {
-        label.textContent = '复制'
-      }
       copyButton.title = '复制代码'
       copyButton.setAttribute('aria-label', '复制代码')
     }, 1500)
@@ -78,18 +70,14 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.3rem;
-    min-height: 1.9rem;
-    padding: 0.28rem 0.55rem;
+    width: 1.9rem;
+    height: 1.9rem;
+    padding: 0;
     border: 1px solid rgb(255 255 255 / 18%);
     border-radius: 0.35rem;
     color: #f8f8f2;
     background: rgb(40 42 54 / 88%);
     box-shadow: 0 0.15rem 0.5rem rgb(0 0 0 / 18%);
-    font-family: var(--font-app);
-    font-size: 0.72rem;
-    font-weight: 700;
-    line-height: 1;
     opacity: 0.76;
     cursor: pointer;
     backdrop-filter: blur(0.4rem);
