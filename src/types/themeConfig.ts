@@ -36,7 +36,7 @@ export interface ConfigSite {
   description: string
   website: string
   pageSize: number
-  socialLinks: { name: string, href: string }[]
+  socialLinks: ConfigSocialLink[]
   navLinks: { name: string, href: string }[]
   categoryMap: { name: string, path: string }[]
   footer: string[]
@@ -54,6 +54,14 @@ export interface ConfigSEO {
   twitter: string
   meta: SeoMeta[]
   link: SeoLink[]
+}
+
+export interface ConfigSocialLink {
+  name: string
+  label?: string
+  href?: string
+  copyText?: string
+  copiedLabel?: string
 }
 
 export interface ConfigComment {

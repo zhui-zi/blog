@@ -9,12 +9,23 @@ export const userConfig: Partial<UserConfig> = {
     website: 'https://keita.cc/',
     pageSize: 10,
     socialLinks: [
-      { name: 'github', href: 'https://github.com/zhui-zi' },
-      { name: 'twitter', href: 'https://x.com/azhuizi' },
-      { name: 'steam', href: 'https://steamcommunity.com/id/hikeita/' },
-      { name: 'discord', href: 'https://discordapp.com/users/890138577185435688' },
-      { name: 'email', href: 'mailto:hikeita@outlook.com' },
-      { name: 'rss', href: '/atom.xml' },
+      { name: 'email-outline', label: 'Email', href: 'mailto:hikeita@outlook.com' },
+      { name: 'school-outline', label: 'Edu Email', href: 'mailto:cjm49@columbia.edu' },
+      { name: 'github', label: 'GitHub', href: 'https://github.com/zhui-zi' },
+      { name: 'twitter', label: 'X', href: 'https://x.com/azhuizi' },
+      { name: 'steam', label: 'Steam', href: 'https://steamcommunity.com/id/hikeita/' },
+      {
+        name: 'nintendo-switch',
+        label: 'Nintendo Switch',
+        copyText: 'SW-3339-4585-7885',
+        copiedLabel: '已复制',
+      },
+      {
+        name: 'discord',
+        label: 'Discord',
+        href: 'https://discordapp.com/users/890138577185435688',
+      },
+      { name: 'rss', label: 'RSS', href: '/atom.xml' },
     ],
     navLinks: [
       { name: 'Posts', href: '/' },
@@ -25,7 +36,6 @@ export const userConfig: Partial<UserConfig> = {
     categoryMap: [],
     footer: [
       '© %year <a href="%website">%author</a>',
-      'Theme <a target="_blank" rel="noopener noreferrer" href="https://github.com/moeyua/astro-theme-typography">Typography</a> by <a target="_blank" rel="noopener noreferrer" href="https://moeyua.com">Moeyua</a>',
       'Published with <a target="_blank" rel="noopener noreferrer" href="https://astro.build/">Astro</a>',
     ],
   },

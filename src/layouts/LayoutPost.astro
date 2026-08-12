@@ -1,15 +1,20 @@
 ---
 import PostMeta from '~/components/PostMeta.astro'
+import TableOfContents from '~/components/TableOfContents.astro'
 import type { Post } from '~/types'
 
 interface Props {
   post: Post
+  showToc?: boolean
 }
 
-const { post } = Astro.props
+const { post, showToc = false } = Astro.props
 ---
 
-<article class="prose">
+<article class="post-article prose">
   <PostMeta post={post} />
-  <slot />
+  {showToc && <TableOfContents />}
+  <div class:list={{ 'post-content': showToc }}>
+    <slot />
+  </div>
 </article>

@@ -7,6 +7,7 @@ import SiteSeo from '~/components/SiteSeo.astro'
 import LaTeX from '~/components/LaTeX.astro'
 import Analytics from '~/components/Analytics.astro'
 import ThemeScript from '~/components/ThemeScript.astro'
+import BackToTop from '~/components/BackToTop.astro'
 import '~/styles/global.css'
 
 const lang = themeConfig.appearance.locale ?? 'en-us'
@@ -35,9 +36,11 @@ const dark = themeConfig.appearance.theme === 'dark'
       <SiteNavigation />
     </header>
 
-    <main class="transition-swup-main overflow-y-scroll scrollbar-hide outline-none" lg="row-1-3 col-1-2 py-20 ">
+    <main class="transition-swup-main site-scrollbar overflow-y-scroll outline-none" lg="row-1-3 col-1-2 py-20 ">
       <slot />
     </main>
+
+    <BackToTop />
 
     <footer class="transition-swup-footer py-7.5" lg="row-2-3 col-2-3">
       <SiteFooter />
