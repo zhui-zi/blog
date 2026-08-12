@@ -25,7 +25,6 @@ export const userConfig: Partial<UserConfig> = {
         label: 'Discord',
         href: 'https://discordapp.com/users/890138577185435688',
       },
-      { name: 'rss', label: 'RSS', href: '/atom.xml' },
     ],
     navLinks: [
       { name: 'Posts', href: '/' },
