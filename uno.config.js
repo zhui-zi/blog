@@ -47,11 +47,6 @@ export default defineConfig({
       /^col-(\d+)-(\d)$/,
       ([, start, end]) => ({ 'grid-column': `${start}/${end}` }),
     ],
-    [
-      /^scrollbar-hide$/,
-      ([_]) => `.scrollbar-hide { scrollbar-width:none;-ms-overflow-style: none; }
-      .scrollbar-hide::-webkit-scrollbar {display:none;}`,
-    ],
   ],
   presets: [
     presetWind3(),
@@ -62,7 +57,7 @@ export default defineConfig({
       theme: {
         dark: {
           colors: { ...colorsDark, shadow: '#FFFFFF0A' },
-          // TODO 需要配置代码块颜色
+          // TODO: Add a dedicated dark code theme.
         },
       },
     }),

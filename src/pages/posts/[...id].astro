@@ -2,10 +2,12 @@
 import type { GetStaticPaths, InferGetStaticPropsType } from 'astro'
 import Comments from '~/components/Comments.astro'
 import Pagination from '~/components/Pagination.astro'
+import QuizEQ from '~/components/QuizEQ.astro'
+import QuizSM from '~/components/QuizSM.astro'
 import SiteSeo from '~/components/SiteSeo.astro'
 import LayoutDefault from '~/layouts/LayoutDefault.astro'
 import LayoutPost from '~/layouts/LayoutPost.astro'
-import { getPosts } from '~/utils'
+import { getPostId, getPostPath, getPosts } from '~/utils'
 import { render } from 'astro:content'
 
 export const getStaticPaths = (async () => {
@@ -14,7 +16,7 @@ export const getStaticPaths = (async () => {
     const prev = posts[idx - 1]
     const next = posts[idx + 1]
     return {
-      params: { id: post.id },
+      params: { id: getPostId(post) },
       props: { entry: post, next, prev },
     }
   })
@@ -26,80 +28,158 @@ type Props = InferGetStaticPropsType<typeof getStaticPaths>
 const { entry, prev, next } = Astro.props
 const { Content } = await render(entry)
 const { translate: t } = Astro.locals
-
-function getUrl(id: string) {
-  return `/posts/${id}`
-}
 ---
 
 <LayoutDefault>
   <SiteSeo slot="seo" title={entry.data.title} desc={entry.data.description} banner={entry.data.banner} />
 
-  <LayoutPost post={entry}>
-    <Content />
+  <LayoutPost post={entry} showToc={!entry.data.quizPage}>
+    {entry.data.quizPage === 'eq' && <QuizEQ />}
+    {entry.data.quizPage === 'sm' && <QuizSM />}
+    {!entry.data.quizPage && <Content />}
   </LayoutPost>
 
   <Pagination
     showLeft={Boolean(prev)}
     leftTitle={`${t('prev_post')}: ${prev?.data.title}`}
-    leftUrl={getUrl(prev?.id)}
+    leftUrl={prev ? getPostPath(prev) : undefined}
     showRight={Boolean(next)}
     rightTitle={`${t('next_post')}: ${next?.data.title}`}
-    rightUrl={getUrl(next?.id)}
+    rightUrl={next ? getPostPath(next) : undefined}
     showPageCount={false}
   />
-  <!-- BUG 这里使用 client:visible 会导致构建失败。ref: https://github.com/withastro/astro/issues/7329 -->
+  <!-- Using client:visible here breaks static builds. See https://github.com/withastro/astro/issues/7329. -->
   <Comments post={entry} />
 </LayoutDefault>
 
 <script>
   import '@github/clipboard-copy-element'
 
-  document.addEventListener('clipboard-copy', (event) => {
-    const target = event.target as HTMLElement
-    const icon = target.querySelector('.icon') as HTMLElement
-    icon.classList.replace('i-mdi-content-copy', 'i-mdi-check')
-    setTimeout(() => {
-      icon.classList.replace('i-mdi-check', 'i-mdi-content-copy')
-    }, 1500)
-  })
+  function setupCodeCopy() {
+    document.querySelectorAll<HTMLElement>('.post-content pre').forEach((codeBlock) => {
+      if (codeBlock.parentElement?.classList.contains('code-container')) {
+        return
+      }
 
-  const codeBlocks = Array.from(document.querySelectorAll('pre'))
-  const icon = "<div class='i-mdi-content-copy icon text-white'></div>"
-  for (const codeBlock of codeBlocks) {
-    const wrapper = document.createElement('div')
-    wrapper.className = 'code-container'
+      const code = codeBlock.querySelector('code')
+      if (!code) {
+        return
+      }
 
-    const copyButton = document.createElement('clipboard-copy')
-    const code = codeBlock.querySelector('code')
-    copyButton.value = code?.textContent ?? ''
-    copyButton.className = 'clipboard-copy'
-    copyButton.innerHTML = icon
+      const wrapper = document.createElement('div')
+      const copyButton = document.createElement('clipboard-copy')
+      wrapper.className = 'code-container'
+      copyButton.value = code.textContent ?? ''
+      copyButton.className = 'clipboard-copy'
+      copyButton.title = '复制代码'
+      copyButton.setAttribute('aria-label', '复制代码')
+      copyButton.setAttribute('aria-live', 'polite')
+      copyButton.innerHTML = `
+        <span class="i-mdi-content-copy copy-icon" aria-hidden="true"></span>
+        <span class="copy-label">复制</span>
+      `
 
-    codeBlock.appendChild(copyButton)
-
-    codeBlock.parentNode?.insertBefore(wrapper, codeBlock)
-    wrapper.appendChild(codeBlock)
+      codeBlock.append(copyButton)
+      codeBlock.parentNode?.insertBefore(wrapper, codeBlock)
+      wrapper.append(codeBlock)
+    })
   }
+
+  function handleCodeCopy(event: Event) {
+    const copyButton = event.target as HTMLElement
+    if (!copyButton.matches('clipboard-copy.clipboard-copy')) {
+      return
+    }
+
+    const icon = copyButton.querySelector<HTMLElement>('.copy-icon')
+    const label = copyButton.querySelector<HTMLElement>('.copy-label')
+    icon?.classList.replace('i-mdi-content-copy', 'i-mdi-check')
+    if (label) {
+      label.textContent = '已复制'
+    }
+    copyButton.title = '已复制'
+    copyButton.setAttribute('aria-label', '代码已复制')
+
+    window.setTimeout(() => {
+      icon?.classList.replace('i-mdi-check', 'i-mdi-content-copy')
+      if (label) {
+        label.textContent = '复制'
+      }
+      copyButton.title = '复制代码'
+      copyButton.setAttribute('aria-label', '复制代码')
+    }, 1500)
+  }
+
+  if (!document.documentElement.dataset.codeCopyListener) {
+    document.documentElement.dataset.codeCopyListener = 'true'
+    document.addEventListener('clipboard-copy', handleCodeCopy)
+  }
+
+  setupCodeCopy()
+  document.addEventListener('astro:page-load', setupCodeCopy)
 </script>
 
 <style is:global>
   .code-container {
     position: relative;
   }
+
   .clipboard-copy {
     position: absolute;
     top: 0.5rem;
     right: 0.5rem;
-    width: 1.75rem;
-    height: 1.75rem;
-    display: flex;
-    justify-content: center;
+    z-index: 1;
+    display: inline-flex;
     align-items: center;
-    border-radius: 0.25rem;
+    justify-content: center;
+    gap: 0.3rem;
+    min-height: 1.9rem;
+    padding: 0.28rem 0.55rem;
+    border: 1px solid rgb(255 255 255 / 18%);
+    border-radius: 0.35rem;
+    color: #f8f8f2;
+    background: rgb(40 42 54 / 88%);
+    box-shadow: 0 0.15rem 0.5rem rgb(0 0 0 / 18%);
+    font-family: var(--font-app);
+    font-size: 0.72rem;
+    font-weight: 700;
+    line-height: 1;
+    opacity: 0.76;
+    cursor: pointer;
+    backdrop-filter: blur(0.4rem);
+    transition:
+      opacity 160ms ease,
+      border-color 160ms ease,
+      transform 160ms ease;
   }
 
-  .clipboard-copy:hover {
-    background-color: #30363d;
+  .code-container:hover .clipboard-copy,
+  .clipboard-copy:hover,
+  .clipboard-copy:focus-visible {
+    border-color: rgb(255 255 255 / 38%);
+    opacity: 1;
+    transform: translateY(-1px);
+  }
+
+  .clipboard-copy:focus-visible {
+    outline: 2px solid #f8f8f2;
+    outline-offset: 2px;
+  }
+
+  .copy-icon {
+    width: 0.9rem;
+    height: 0.9rem;
+  }
+
+  @media (max-width: 640px) {
+    .clipboard-copy {
+      opacity: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .clipboard-copy {
+      transition: none;
+    }
   }
 </style>

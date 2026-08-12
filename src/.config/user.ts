@@ -1,7 +1,60 @@
 import type { UserConfig } from '~/types'
 
 export const userConfig: Partial<UserConfig> = {
-  // Override the default config here
-  // site: { title: "講評世界" },
-  // seo: { twitter: "@moeyua13" },
+  site: {
+    title: '黑川启太',
+    subtitle: 'Keita',
+    author: '黑川启太',
+    description: '從瘋人院逃離後重新回到社會。',
+    website: 'https://keita.cc/',
+    pageSize: 10,
+    socialLinks: [
+      { name: 'email-outline', label: 'Email', href: 'mailto:hikeita@outlook.com' },
+      { name: 'school-outline', label: 'Edu Email', href: 'mailto:cjm49@columbia.edu' },
+      { name: 'github', label: 'GitHub', href: 'https://github.com/zhui-zi' },
+      { name: 'twitter', label: 'X', href: 'https://x.com/azhuizi' },
+      { name: 'steam', label: 'Steam', href: 'https://steamcommunity.com/id/hikeita/' },
+      {
+        name: 'nintendo-switch',
+        label: 'Nintendo Switch',
+        copyText: 'SW-3339-4585-7885',
+        copiedLabel: '已复制',
+      },
+      {
+        name: 'discord',
+        label: 'Discord',
+        href: 'https://discordapp.com/users/890138577185435688',
+      },
+      { name: 'rss', label: 'RSS', href: '/atom.xml' },
+    ],
+    navLinks: [
+      { name: 'Posts', href: '/' },
+      { name: 'Archive', href: '/archive' },
+      { name: 'Categories', href: '/categories' },
+      { name: 'About', href: '/about' },
+    ],
+    categoryMap: [],
+    footer: [
+      '© %year <a href="%website">%author</a>',
+      'Published with <a target="_blank" rel="noopener noreferrer" href="https://astro.build/">Astro</a>',
+    ],
+  },
+  appearance: {
+    theme: 'system',
+    locale: 'zh-cn',
+    colorsLight: {
+      primary: '#2e405b',
+      background: '#ffffff',
+    },
+    colorsDark: {
+      primary: '#f3f0e8',
+      background: '#232222',
+    },
+  },
+  seo: {
+    twitter: '@azhuizi',
+  },
+  rss: {
+    fullText: true,
+  },
 }

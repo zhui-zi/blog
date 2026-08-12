@@ -1,0 +1,80 @@
+<button class="back-to-top" type="button" data-back-to-top aria-label="返回顶部" title="返回顶部" hidden>
+  <span aria-hidden="true">&#8593;</span>
+</button>
+
+<script>
+  function setupBackToTop() {
+    const scroller = document.querySelector<HTMLElement>('main.site-scrollbar')
+    const button = document.querySelector<HTMLButtonElement>('[data-back-to-top]')
+    if (!scroller || !button) {
+      return
+    }
+
+    const update = () => {
+      const isPost = Boolean(scroller.querySelector('.post-content'))
+      button.hidden = !isPost || scroller.scrollTop < 480
+    }
+
+    if (!scroller.dataset.backToTopReady) {
+      scroller.dataset.backToTopReady = 'true'
+      scroller.addEventListener('scroll', update, { passive: true })
+    }
+
+    if (!button.dataset.ready) {
+      button.dataset.ready = 'true'
+      button.addEventListener('click', () => {
+        document.querySelector<HTMLElement>('main.site-scrollbar')?.scrollTo({ top: 0, behavior: 'smooth' })
+      })
+    }
+
+    update()
+  }
+
+  setupBackToTop()
+  document.addEventListener('astro:page-load', setupBackToTop)
+</script>
+
+<style>
+  .back-to-top {
+    position: fixed;
+    right: clamp(1rem, 3vw, 2.25rem);
+    bottom: clamp(1rem, 3vw, 2.25rem);
+    z-index: 20;
+    display: grid;
+    width: 2.75rem;
+    height: 2.75rem;
+    place-items: center;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    color: var(--color-foreground);
+    background: color-mix(in srgb, var(--color-background) 90%, transparent);
+    box-shadow: 0 0.35rem 1.25rem color-mix(in srgb, var(--color-foreground) 16%, transparent);
+    font: inherit;
+    font-size: 1.25rem;
+    cursor: pointer;
+    backdrop-filter: blur(0.6rem);
+    transition:
+      border-color 180ms ease,
+      transform 180ms ease;
+  }
+
+  .back-to-top[hidden] {
+    display: none;
+  }
+
+  .back-to-top:hover {
+    border-color: color-mix(in srgb, var(--color-foreground) 58%, transparent);
+    transform: translateY(-2px);
+  }
+
+  .back-to-top:focus-visible {
+    outline: 2px solid var(--color-foreground);
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .back-to-top {
+      transition: none;
+    }
+  }
+</style>

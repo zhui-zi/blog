@@ -1,4 +1,4 @@
-import type { Link, Meta } from 'astro-seo'
+import type { SEOProps } from 'astro-seo'
 import type {
   AvailableLanguage,
   BooleanString,
@@ -9,6 +9,9 @@ import type {
   Theme,
 } from 'giscus'
 import type { LANGUAGES } from '../i18n.ts'
+
+type SeoLink = NonNullable<NonNullable<SEOProps['extend']>['link']>[number]
+type SeoMeta = NonNullable<NonNullable<SEOProps['extend']>['meta']>[number]
 
 export type DeepPartial<T> = {
   [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
@@ -33,7 +36,7 @@ export interface ConfigSite {
   description: string
   website: string
   pageSize: number
-  socialLinks: { name: string, href: string }[]
+  socialLinks: ConfigSocialLink[]
   navLinks: { name: string, href: string }[]
   categoryMap: { name: string, path: string }[]
   footer: string[]
@@ -49,8 +52,16 @@ export interface ConfigAppearance {
 
 export interface ConfigSEO {
   twitter: string
-  meta: Partial<Meta>[]
-  link: Partial<Link>[]
+  meta: SeoMeta[]
+  link: SeoLink[]
+}
+
+export interface ConfigSocialLink {
+  name: string
+  label?: string
+  href?: string
+  copyText?: string
+  copiedLabel?: string
 }
 
 export interface ConfigComment {
@@ -83,7 +94,7 @@ interface Colors {
 interface Fonts {
   header: string
   ui: string
-  // TODO: 未实现
+  // Reserved for future article font support.
   _article?: string
   _code?: string
 }

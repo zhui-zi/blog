@@ -42,6 +42,28 @@ export async function getPosts(isArchivePage = false) {
   return posts
 }
 
+export function getPostId(post: Post | string) {
+  const id = typeof post === 'string' ? post : post.id
+  return id
+    .split('/')
+    .map(slugifyPathSegment)
+    .join('/')
+}
+
+export function getPostPath(post: Post | string) {
+  return `/posts/${getPostId(post)}/`
+}
+
+function slugifyPathSegment(segment: string) {
+  return segment
+    .normalize('NFKC')
+    .trim()
+    .toLocaleLowerCase('en-US')
+    .replace(/[’']/g, '')
+    .replace(/[^\p{Letter}\p{Number}.]+/gu, '-')
+    .replace(/^-+|-+$/g, '')
+}
+
 const parser = new MarkdownIt()
 export function getPostDescription(post: Post) {
   if (post.data.description) {

@@ -19,13 +19,77 @@ const { translate: t } = Astro.locals
   </ul>
   <ul flex="~ row gap-1 justify-center">
     {
-      socialLinks.map(({ href, name }) => (
+      socialLinks.map(({ href, name, label = name, copyText, copiedLabel }) => (
         <li>
-          <a href={href} target="_blank" title={name} class="not-underline-hover inline-flex items-center">
-            <span class:list={[`i-mdi-${name}`, 'w-6 h-6']}>{name}</span>
-          </a>
+          {copyText ? (
+            <button
+              type="button"
+              title={`${label}: ${copyText}`}
+              aria-label={`${label}: ${copyText}`}
+              data-social-copy={copyText}
+              data-copied-label={copiedLabel ?? 'Copied'}
+              class="social-link not-underline-hover inline-flex items-center"
+            >
+              <span aria-hidden="true" class:list={[`i-mdi-${name}`, 'w-6 h-6']} />
+              <span class="sr-only">{label}</span>
+            </button>
+          ) : (
+            <a
+              href={href}
+              target={href?.startsWith('http') ? '_blank' : undefined}
+              rel={href?.startsWith('http') ? 'noopener noreferrer' : undefined}
+              title={label}
+              aria-label={label}
+              class="social-link not-underline-hover inline-flex items-center"
+            >
+              <span aria-hidden="true" class:list={[`i-mdi-${name}`, 'w-6 h-6']} />
+              <span class="sr-only">{label}</span>
+            </a>
+          )}
         </li>
       ))
     }
   </ul>
 </nav>
+
+<script>
+  function setupSocialCopy() {
+    document.querySelectorAll<HTMLButtonElement>('[data-social-copy]').forEach((button) => {
+      if (button.dataset.copyReady) {
+        return
+      }
+      button.dataset.copyReady = 'true'
+
+      button.addEventListener('click', async () => {
+        const value = button.dataset.socialCopy
+        if (!value) {
+          return
+        }
+
+        await navigator.clipboard.writeText(value)
+        const originalTitle = button.title
+        button.title = button.dataset.copiedLabel ?? 'Copied'
+        button.setAttribute('aria-label', button.title)
+
+        window.setTimeout(() => {
+          button.title = originalTitle
+          button.setAttribute('aria-label', originalTitle)
+        }, 1500)
+      })
+    })
+  }
+
+  setupSocialCopy()
+  document.addEventListener('astro:page-load', setupSocialCopy)
+</script>
+
+<style>
+  .social-link {
+    appearance: none;
+    border: 0;
+    padding: 0;
+    color: inherit;
+    background: transparent;
+    cursor: pointer;
+  }
+</style>

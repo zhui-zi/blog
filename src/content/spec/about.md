@@ -1,6 +1,8 @@
 ---
 title: 关于
-pubDate: 2024-12-06
+pubDate: 2022-09-11
 ---
 
-此主题系 Hexo 主题 <a href="https://github.com/sumimakito/hexo-theme-typography">活版印字</a> 在 Astro 平台上的移植版本
+# 黑川启太
+
+i live in mars 👨‍🚀🔴✨

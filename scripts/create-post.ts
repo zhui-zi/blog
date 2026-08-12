@@ -18,19 +18,26 @@ async function createPost(): Promise<void> {
   const extension: string = await consola.prompt('Select file extension: ', { type: 'select', options: ['.md', '.mdx'] })
   const isDraft: boolean = await consola.prompt('Is this a draft?', { type: 'confirm', initial: true })
 
-  const targetDir = './src/content/posts/'
-  const fullPath: string = path.join(targetDir, `${filename}${extension}`)
+  const safeFilename = filename
+    .trim()
+    .replace(/[<>:"/\\|?*]/g, '-')
+    .replace(/-+/g, '-')
+  if (!safeFilename)
+    throw new Error('File name cannot be empty.')
+
+  const targetDir = path.join('./src/content/posts', dayjs().format('YYYY/MM/DD'))
+  const fullPath: string = path.join(targetDir, `${safeFilename}${extension}`)
 
   const frontmatter = getFrontmatter({
-    title: filename,
+    title: JSON.stringify(filename),
     pubDate: dayjs().format('YYYY-MM-DD'),
     categories: '[]',
     description: '\'\'',
-    slug: filename.toLowerCase().replace(/\s+/g, '-'),
     draft: isDraft ? 'true' : 'false',
   })
 
   try {
+    fs.mkdirSync(targetDir, { recursive: true })
     fs.writeFileSync(fullPath, frontmatter)
     consola.success('New post created successfully!')
 

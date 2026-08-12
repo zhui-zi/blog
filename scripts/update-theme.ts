@@ -2,11 +2,15 @@ import { execSync } from 'node:child_process'
 import process from 'node:process'
 
 try {
-  // 检查是否已经添加了模板仓库
-  execSync('git remote | grep template', { stdio: 'ignore' })
+  // Check whether the template remote already exists.
+  const remotes = execSync('git remote', { encoding: 'utf8' })
+    .split(/\r?\n/)
+    .filter(Boolean)
+  if (!remotes.includes('template'))
+    throw new Error('Missing template remote')
 }
 catch {
-  // 如果没有添加，则添加模板仓库
+  // Add the template remote when it is missing.
   execSync(
     'git remote add template https://github.com/moeyua/astro-theme-typography.git',
     { stdio: 'inherit' },
@@ -14,15 +18,15 @@ catch {
 }
 
 try {
-  // 获取模板仓库的最新更改
+  // Fetch the latest template changes.
   execSync('git fetch template', { stdio: 'inherit' })
 
-  // 将模板仓库的最新更改合并到当前分支
+  // Merge the latest template changes into the current branch.
   execSync('git merge template/main --allow-unrelated-histories', {
     stdio: 'inherit',
   })
 }
 catch (error) {
-  console.error('更新主题时出错:', error)
+  console.error('Failed to update the theme:', error)
   process.exit(1)
 }
