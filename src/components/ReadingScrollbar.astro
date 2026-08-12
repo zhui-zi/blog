@@ -1,0 +1,266 @@
+<div class="reading-scrollbar" data-reading-scrollbar hidden>
+  <div
+    class="reading-scrollbar-track"
+    data-reading-scrollbar-track
+    role="scrollbar"
+    tabindex="0"
+    aria-label="文章滚动位置"
+    aria-orientation="vertical"
+    aria-valuemin="0"
+    aria-valuemax="100"
+    aria-valuenow="0"
+  >
+    <span class="reading-scrollbar-rail" aria-hidden="true"></span>
+    <span class="reading-scrollbar-thumb" data-reading-scrollbar-thumb aria-hidden="true"></span>
+    <span class="reading-scrollbar-progress" data-reading-scrollbar-progress aria-hidden="true">0%</span>
+  </div>
+</div>
+
+<script>
+  interface ReadingScrollbarElement extends HTMLElement {
+    scrollbarCleanup?: () => void
+  }
+
+  function setupReadingScrollbar() {
+    const root = document.querySelector<ReadingScrollbarElement>('[data-reading-scrollbar]')
+    const main = document.querySelector<HTMLElement>('main.site-scrollbar')
+    const track = root?.querySelector<HTMLElement>('[data-reading-scrollbar-track]')
+    const thumb = root?.querySelector<HTMLElement>('[data-reading-scrollbar-thumb]')
+    const progress = root?.querySelector<HTMLElement>('[data-reading-scrollbar-progress]')
+
+    root?.scrollbarCleanup?.()
+    if (!root || !main || !track || !thumb || !progress) {
+      if (root) {
+        root.hidden = true
+      }
+      return
+    }
+
+    const scroller = main.scrollHeight - main.clientHeight > 1 ? main : (document.scrollingElement as HTMLElement)
+    const scrollTarget: EventTarget = scroller === document.scrollingElement ? window : scroller
+
+    const controller = new AbortController()
+    const { signal } = controller
+    let resizeObserver: ResizeObserver | undefined
+
+    const update = () => {
+      const maxScroll = scroller.scrollHeight - scroller.clientHeight
+      root.hidden = maxScroll <= 1
+      if (root.hidden) {
+        return
+      }
+
+      const trackHeight = track.clientHeight
+      const thumbHeight = Math.max(48, trackHeight * (scroller.clientHeight / scroller.scrollHeight))
+      const travel = Math.max(0, trackHeight - thumbHeight)
+      const ratio = Math.min(1, Math.max(0, scroller.scrollTop / maxScroll))
+      const offset = ratio * travel
+      const percentage = Math.round(ratio * 100)
+
+      root.style.setProperty('--scroll-thumb-height', `${thumbHeight}px`)
+      root.style.setProperty('--scroll-thumb-offset', `${offset}px`)
+      root.style.setProperty('--scroll-progress-offset', `${offset + thumbHeight / 2}px`)
+      progress.textContent = `${percentage}%`
+      track.setAttribute('aria-valuenow', `${percentage}`)
+      track.setAttribute('aria-controls', scroller.id)
+    }
+
+    const scrollBy = (amount: number) => {
+      scroller.scrollTo({ top: scroller.scrollTop + amount, behavior: 'smooth' })
+    }
+
+    const handleTrackClick = (event: MouseEvent) => {
+      if (event.target === thumb) {
+        return
+      }
+      const bounds = track.getBoundingClientRect()
+      const ratio = Math.min(1, Math.max(0, (event.clientY - bounds.top) / bounds.height))
+      const maxScroll = scroller.scrollHeight - scroller.clientHeight
+      scroller.scrollTo({ top: ratio * maxScroll, behavior: 'smooth' })
+    }
+
+    const handleThumbPointerDown = (event: PointerEvent) => {
+      event.preventDefault()
+      thumb.setPointerCapture(event.pointerId)
+      root.classList.add('is-dragging')
+
+      const startY = event.clientY
+      const startScrollTop = scroller.scrollTop
+      const maxScroll = scroller.scrollHeight - scroller.clientHeight
+      const travel = Math.max(1, track.clientHeight - thumb.clientHeight)
+
+      const handlePointerMove = (moveEvent: PointerEvent) => {
+        const nextScrollTop = startScrollTop + ((moveEvent.clientY - startY) / travel) * maxScroll
+        scroller.scrollTop = Math.min(maxScroll, Math.max(0, nextScrollTop))
+      }
+
+      const handlePointerUp = () => {
+        root.classList.remove('is-dragging')
+        window.removeEventListener('pointermove', handlePointerMove)
+        window.removeEventListener('pointerup', handlePointerUp)
+      }
+
+      window.addEventListener('pointermove', handlePointerMove)
+      window.addEventListener('pointerup', handlePointerUp, { once: true })
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const pageStep = scroller.clientHeight * 0.85
+      const lineStep = scroller.clientHeight * 0.12
+
+      switch (event.key) {
+        case 'ArrowDown':
+          scrollBy(lineStep)
+          break
+        case 'ArrowUp':
+          scrollBy(-lineStep)
+          break
+        case 'PageDown':
+          scrollBy(pageStep)
+          break
+        case 'PageUp':
+          scrollBy(-pageStep)
+          break
+        case 'Home':
+          scroller.scrollTo({ top: 0, behavior: 'smooth' })
+          break
+        case 'End':
+          scroller.scrollTo({ top: scroller.scrollHeight, behavior: 'smooth' })
+          break
+        default:
+          return
+      }
+
+      event.preventDefault()
+    }
+
+    if (!scroller.id) {
+      scroller.id = 'post-scroll-container'
+    }
+    scrollTarget.addEventListener('scroll', update, { passive: true, signal })
+    track.addEventListener('click', handleTrackClick, { signal })
+    track.addEventListener('keydown', handleKeyDown, { signal })
+    thumb.addEventListener('pointerdown', handleThumbPointerDown, { signal })
+
+    if ('ResizeObserver' in window) {
+      resizeObserver = new ResizeObserver(update)
+      resizeObserver.observe(scroller)
+      resizeObserver.observe(track)
+    }
+
+    root.scrollbarCleanup = () => {
+      controller.abort()
+      resizeObserver?.disconnect()
+    }
+    update()
+  }
+
+  setupReadingScrollbar()
+  document.addEventListener('astro:page-load', setupReadingScrollbar)
+</script>
+
+<style>
+  .reading-scrollbar {
+    position: fixed;
+    z-index: 40;
+    top: max(4rem, env(safe-area-inset-top));
+    right: max(0.55rem, env(safe-area-inset-right));
+    bottom: max(4rem, env(safe-area-inset-bottom));
+    width: 1rem;
+    text-shadow: none;
+  }
+
+  .reading-scrollbar-track {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    outline: none;
+  }
+
+  .reading-scrollbar-rail {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 1px;
+    background: color-mix(in srgb, var(--color-foreground) 16%, transparent);
+    transform: translateX(-50%);
+  }
+
+  .reading-scrollbar-thumb {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 3px;
+    height: var(--scroll-thumb-height, 3rem);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-foreground) 68%, transparent);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-background) 55%, transparent);
+    cursor: grab;
+    transform: translate(-50%, var(--scroll-thumb-offset, 0));
+    transition:
+      width 160ms ease,
+      background-color 160ms ease;
+    touch-action: none;
+  }
+
+  .reading-scrollbar-progress {
+    position: absolute;
+    top: var(--scroll-progress-offset, 0);
+    right: calc(100% + 0.35rem);
+    padding: 0.18rem 0.32rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.25rem;
+    color: var(--color-foreground);
+    background: color-mix(in srgb, var(--color-background) 90%, transparent);
+    font-size: 0.62rem;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    opacity: 0;
+    transform: translateY(-50%);
+    transition: opacity 160ms ease;
+  }
+
+  .reading-scrollbar-track:hover .reading-scrollbar-thumb,
+  .reading-scrollbar-track:focus-visible .reading-scrollbar-thumb,
+  .reading-scrollbar.is-dragging .reading-scrollbar-thumb {
+    width: 5px;
+    background: var(--color-foreground);
+  }
+
+  .reading-scrollbar-track:hover .reading-scrollbar-progress,
+  .reading-scrollbar-track:focus-visible .reading-scrollbar-progress,
+  .reading-scrollbar.is-dragging .reading-scrollbar-progress {
+    opacity: 0.72;
+  }
+
+  .reading-scrollbar.is-dragging .reading-scrollbar-thumb {
+    cursor: grabbing;
+  }
+
+  .reading-scrollbar-track:focus-visible {
+    border-radius: 999px;
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-foreground) 18%, transparent);
+  }
+
+  @media (max-width: 1023px) {
+    .reading-scrollbar {
+      top: max(1.25rem, env(safe-area-inset-top));
+      right: max(0.15rem, env(safe-area-inset-right));
+      bottom: max(1.25rem, env(safe-area-inset-bottom));
+      width: 0.7rem;
+    }
+
+    .reading-scrollbar-progress {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reading-scrollbar-thumb,
+    .reading-scrollbar-progress {
+      transition: none;
+    }
+  }
+</style>

@@ -13,45 +13,28 @@ html {
   --at-apply: antialiased;
   --at-apply: 'bg-background c-primary font-ui text-shadow-color-shadow';
 
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
   text-shadow: 1px 1px 1px var(--uno-colors-shadow);
   background-size: 7px 7px;
   background-image: linear-gradient(to right, var(--uno-colors-shadow) 1px, transparent 1px),
     linear-gradient(to bottom, var(--uno-colors-shadow) 1px, transparent 1px);
 }
 
-.site-scrollbar {
-  scrollbar-color: color-mix(in srgb, var(--color-foreground) 46%, transparent)
-    color-mix(in srgb, var(--color-foreground) 7%, transparent);
-  scrollbar-gutter: stable;
-  scrollbar-width: thin;
+html::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
-.site-scrollbar::-webkit-scrollbar {
-  width: 0.6rem;
-}
-
-.site-scrollbar::-webkit-scrollbar-track {
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--color-foreground) 7%, transparent);
-}
-
-.site-scrollbar::-webkit-scrollbar-thumb {
-  border: 0.18rem solid transparent;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--color-foreground) 46%, transparent);
-  background-clip: padding-box;
-}
-
-.site-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: color-mix(in srgb, var(--color-foreground) 72%, transparent);
-  background-clip: padding-box;
-}
-
+.site-scrollbar,
 .site-scrollbar-hidden {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
 
+.site-scrollbar::-webkit-scrollbar,
 .site-scrollbar-hidden::-webkit-scrollbar {
   display: none;
   width: 0;

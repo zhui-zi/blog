@@ -8,6 +8,7 @@ import LaTeX from '~/components/LaTeX.astro'
 import Analytics from '~/components/Analytics.astro'
 import ThemeScript from '~/components/ThemeScript.astro'
 import BackToTop from '~/components/BackToTop.astro'
+import ReadingScrollbar from '~/components/ReadingScrollbar.astro'
 import '~/styles/global.css'
 
 const lang = themeConfig.appearance.locale ?? 'en-us'
@@ -26,7 +27,7 @@ const isPostPage = Astro.url.pathname.startsWith('/posts/')
   <body
     class="h-100vh w-full max-w-1200px min-w-0 mx-a"
     p="7.5 lg:(y-0 x-20)"
-    lg="grid gap-x-6 cols-[3fr_1fr] rows-[1fr_9rem]"
+    lg="grid gap-x-6 cols-[3fr_1fr] rows-[minmax(0,1fr)_9rem]"
   >
     <header
       class="transition-swup-header flex flex-col gap-2.5"
@@ -39,7 +40,7 @@ const isPostPage = Astro.url.pathname.startsWith('/posts/')
 
     <main
       class:list={[
-        'site-main transition-swup-main overflow-y-scroll outline-none',
+        'site-main transition-swup-main min-h-0 overflow-y-scroll outline-none',
         isPostPage ? 'site-scrollbar' : 'site-scrollbar-hidden',
       ]}
     >
@@ -47,6 +48,7 @@ const isPostPage = Astro.url.pathname.startsWith('/posts/')
     </main>
 
     <BackToTop />
+    <ReadingScrollbar />
 
     <footer class="transition-swup-footer py-7.5" lg="row-2-3 col-2-3">
       <SiteFooter />
